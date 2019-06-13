@@ -1,0 +1,45 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:local="clr-namespace:SOTA.DeviceEmulator.Views.Styles"
+                    xmlns:system="clr-namespace:System;assembly=mscorlib">
+    <!--Spacing-->
+    <system:Double x:Key="SpacingSmall">4</system:Double>
+    <Thickness x:Key="ThicknessSmallAllSides"
+               Left="{StaticResource SpacingSmall}"
+               Right="{StaticResource SpacingSmall}"
+               Top="{StaticResource SpacingSmall}"
+               Bottom="{StaticResource SpacingSmall}" />
+    <Thickness x:Key="ThicknessSmallLeftRight"
+               Left="{StaticResource SpacingSmall}"
+               Right="{StaticResource SpacingSmall}" />
+    <Thickness x:Key="ThicknessSmallTop"
+               Top="{StaticResource SpacingSmall}" />
+
+    <system:Double x:Key="SpacingMedium">8</system:Double>
+    <Thickness x:Key="ThicknessMediumAllSides"
+               Left="{StaticResource SpacingMedium}"
+               Right="{StaticResource SpacingMedium}"
+               Top="{StaticResource SpacingMedium}"
+               Bottom="{StaticResource SpacingMedium}" />
+    <Thickness x:Key="ThicknessMediumLeftRight"
+               Left="{StaticResource SpacingSmall}"
+               Right="{StaticResource SpacingSmall}" />
+    <Thickness x:Key="ThicknessMediumTop"
+               Top="{StaticResource SpacingMedium}" />
+
+    <system:Double x:Key="SpacingLarge">16</system:Double>
+    <Thickness x:Key="ThicknessLargeAllSides"
+               Left="{StaticResource SpacingLarge}"
+               Right="{StaticResource SpacingLarge}"
+               Top="{StaticResource SpacingLarge}"
+               Bottom="{StaticResource SpacingLarge}" />
+    <Thickness x:Key="ThicknessLargeLeftRight"
+               Left="{StaticResource SpacingSmall}"
+               Right="{StaticResource SpacingSmall}" />
+    <Thickness x:Key="ThicknessLargeTop"
+               Top="{StaticResource SpacingLarge}" />
+
+    <!--Text-->
+    <system:Double x:Key="TextTitle">24</system:Double>
+    <system:Double x:Key="TextSubtitle">20</system:Double>
+</ResourceDictionary>
