@@ -3,7 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28307.572
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SOTA.DeviceEmulator", "SOTA.DeviceEmulator\SOTA.DeviceEmulator.csproj", "{B2C3F20C-B53B-4DE2-AE34-87BB6D98B099}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SOTA.DeviceEmulator", "src\SOTA.DeviceEmulator\SOTA.DeviceEmulator.csproj", "{B2C3F20C-B53B-4DE2-AE34-87BB6D98B099}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Code", "Code", "{61569584-CC86-438C-A389-720169F1416C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documentation", "Documentation", "{42B9B4A6-2757-4B01-B19D-79DAA0B9FF23}"
+	ProjectSection(SolutionItems) = preProject
+		LICENSE = LICENSE
+		README.md = README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -18,6 +26,9 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{B2C3F20C-B53B-4DE2-AE34-87BB6D98B099} = {61569584-CC86-438C-A389-720169F1416C}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {9FA9F07C-759F-4351-8FBF-4D597C0D70C2}
