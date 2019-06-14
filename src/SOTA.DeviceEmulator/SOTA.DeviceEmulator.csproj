@@ -157,7 +157,6 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="DeviceEmulatorModule.cs" />
-    <Compile Include="Services\Infrastructure\IClock.cs" />
     <Compile Include="Services\Infrastructure\Jobs\IToggleable.cs" />
     <Compile Include="Services\Infrastructure\Jobs\ToggleableMediatorServiceFactory.cs" />
     <Compile Include="Services\Infrastructure\Jobs\SystemClock.cs" />

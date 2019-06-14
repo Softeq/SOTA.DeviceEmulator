@@ -1,4 +1,5 @@
 ﻿using System;
+using SOTA.DeviceEmulator.Core;
 
 namespace SOTA.DeviceEmulator.Services.Infrastructure.Jobs
 {
