@@ -1,7 +1,7 @@
 ﻿using System;
 using Serilog.Events;
 
-namespace SOTA.DeviceEmulator.Infrastructure.Logging
+namespace SOTA.DeviceEmulator.Services.Infrastructure.Logging
 {
     public class LogEventViewModel
     {
