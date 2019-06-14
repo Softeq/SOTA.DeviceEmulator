@@ -1,11 +1,12 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:local="clr-namespace:SOTA.DeviceEmulator.Views.Styles">
+                    xmlns:adonisUi="clr-namespace:AdonisUI;assembly=AdonisUI">
     <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="Adonis.xaml"/>
         <ResourceDictionary Source="Controls.xaml" />
         <ResourceDictionary Source="Sizes.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
-    <!-- Default Styles -->
-    <Style TargetType="Button" BasedOn="{StaticResource PrimaryButton}" />
+    <!--Default styles-->
+    <Style TargetType="Window" BasedOn="{StaticResource {x:Type Window}}"/>
 </ResourceDictionary>
