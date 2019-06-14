@@ -94,5 +94,11 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\SOTA.DeviceEmulator.Core\SOTA.DeviceEmulator.Core.csproj">
+      <Project>{f4b4d2da-1097-477a-abbd-4e01532911c0}</Project>
+      <Name>SOTA.DeviceEmulator.Core</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

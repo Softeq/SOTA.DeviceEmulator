@@ -1,0 +1,13 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Ensure.That" Version="8.1.1" />
+    <PackageReference Include="GeoAPI" Version="1.7.5" />
+    <PackageReference Include="NetTopologySuite" Version="1.15.2" />
+  </ItemGroup>
+
+</Project>
