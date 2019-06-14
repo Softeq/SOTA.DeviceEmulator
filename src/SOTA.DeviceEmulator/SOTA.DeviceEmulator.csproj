@@ -79,7 +79,6 @@
     <Compile Include="DeviceEmulatorModule.cs" />
     <Compile Include="Infrastructure\Logging\LogEventViewModel.cs" />
     <Compile Include="Infrastructure\Logging\SerilogExtensions.cs" />
-    <Compile Include="Infrastructure\Navigation\NavigationServiceHolder.cs" />
     <Compile Include="Infrastructure\Logging\ObservableCollectionLogEventSink.cs" />
     <Compile Include="ViewModels\ConnectionViewModel.cs" />
     <Compile Include="ViewModels\ITabViewModel.cs" />

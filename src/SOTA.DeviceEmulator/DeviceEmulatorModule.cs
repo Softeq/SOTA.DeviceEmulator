@@ -3,7 +3,6 @@ using Autofac;
 using Caliburn.Micro;
 using Serilog;
 using Serilog.Events;
-using SOTA.DeviceEmulator.Framework;
 using SOTA.DeviceEmulator.Infrastructure.Logging;
 using SOTA.DeviceEmulator.ViewModels;
 
@@ -38,13 +37,6 @@ namespace SOTA.DeviceEmulator
             builder.RegisterAssemblyTypes(ThisAssembly)
                 .AssignableTo<PropertyChangedBase>()
                 .AsSelf()
-                .InstancePerDependency();
-            builder.RegisterType<NavigationServiceHolder>()
-                .AsSelf()
-                .SingleInstance();
-            builder
-                .Register(c => c.Resolve<NavigationServiceHolder>().NavigationService)
-                .As<INavigationService>()
                 .InstancePerDependency();
         }
     }

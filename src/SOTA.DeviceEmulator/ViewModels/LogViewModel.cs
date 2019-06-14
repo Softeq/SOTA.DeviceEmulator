@@ -1,7 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using Caliburn.Micro;
 using EnsureThat;
-using SOTA.DeviceEmulator.Framework;
+using SOTA.DeviceEmulator.Infrastructure.Logging;
 
 namespace SOTA.DeviceEmulator.ViewModels
 {

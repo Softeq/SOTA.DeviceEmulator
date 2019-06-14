@@ -3,7 +3,6 @@ using EnsureThat;
 using Serilog;
 using Serilog.Configuration;
 using Serilog.Events;
-using SOTA.DeviceEmulator.Framework;
 
 namespace SOTA.DeviceEmulator.Infrastructure.Logging
 {

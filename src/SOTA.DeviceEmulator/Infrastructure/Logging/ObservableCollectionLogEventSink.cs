@@ -3,7 +3,7 @@ using EnsureThat;
 using Serilog.Core;
 using Serilog.Events;
 
-namespace SOTA.DeviceEmulator.Framework
+namespace SOTA.DeviceEmulator.Infrastructure.Logging
 {
     public class ObservableCollectionLogEventSink : ILogEventSink
     {
