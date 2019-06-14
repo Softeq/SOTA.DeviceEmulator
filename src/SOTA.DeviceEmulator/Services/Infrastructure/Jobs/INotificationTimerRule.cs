@@ -1,5 +1,5 @@
 ﻿using System;
-using MediatR;
+using Caliburn.Micro;
 
 namespace SOTA.DeviceEmulator.Services.Infrastructure.Jobs
 {
@@ -7,6 +7,6 @@ namespace SOTA.DeviceEmulator.Services.Infrastructure.Jobs
     {
         TimeSpan Period { get; }
 
-        INotification CreateNotification();
+        void Trigger();
     }
 }

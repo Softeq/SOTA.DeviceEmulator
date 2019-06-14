@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Caliburn.Micro;
 using EnsureThat;
 using Microsoft.Extensions.Hosting;
 using Serilog;
@@ -12,21 +11,19 @@ namespace SOTA.DeviceEmulator.Services.Infrastructure.Jobs
 {
     public class NotificationTimerBackgroundService : BackgroundService
     {
-        private readonly ILogger _logger;
         private readonly IClock _clock;
-        private readonly IEventAggregator _eventAggregator;
+        private readonly ILogger _logger;
         private readonly List<NotificationTimer> _timers;
 
-        public NotificationTimerBackgroundService(ILogger logger, IClock clock, IEnumerable<INotificationTimerRule> timerRules, IEventAggregator eventAggregator)
+        public NotificationTimerBackgroundService(ILogger logger, IClock clock,
+            IEnumerable<INotificationTimerRule> timerRules)
         {
             Ensure.Any.IsNotNull(clock, nameof(clock));
             Ensure.Any.IsNotNull(logger, nameof(logger));
-            Ensure.Any.IsNotNull(eventAggregator, nameof(eventAggregator));
             Ensure.Any.IsNotNull(timerRules, nameof(timerRules));
 
             _logger = logger;
             _clock = clock;
-            _eventAggregator = eventAggregator;
             _timers = timerRules.Select(rule => new NotificationTimer(rule)).ToList();
         }
 
@@ -38,16 +35,18 @@ namespace SOTA.DeviceEmulator.Services.Infrastructure.Jobs
                 _logger.Warning("No timers registered.");
                 return;
             }
+
             // Delay to let UI subscribe to changes
             await SafeDelay(TimeSpan.FromSeconds(1), stoppingToken);
             while (!stoppingToken.IsCancellationRequested)
             {
                 var now = _clock.UtcNow;
+
                 TimeSpan TriggerSafe(NotificationTimer timer)
                 {
                     try
                     {
-                        return timer.TriggerIfScheduled(_eventAggregator, now);
+                        return timer.TriggerIfScheduled(now);
                     }
                     catch (Exception ex)
                     {
@@ -55,13 +54,16 @@ namespace SOTA.DeviceEmulator.Services.Infrastructure.Jobs
                         return TimeSpan.FromMinutes(1);
                     }
                 }
+
                 var delay = _timers.Select(TriggerSafe).Min();
                 if (delay <= TimeSpan.Zero)
                 {
                     continue;
                 }
+
                 await SafeDelay(delay, stoppingToken);
             }
+
             _logger.Information("Notification timer is stopped.");
         }
 
