@@ -9,7 +9,8 @@
                 <ResourceDictionary>
                     <local:Bootstrapper x:Key="Bootstrapper" />
                 </ResourceDictionary>
-                <ResourceDictionary Source="Views/Styles/Adonis.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/AdonisUI;component/ColorSchemes/Light.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/AdonisUI.ClassicTheme;component/Resources.xaml" />
                 <ResourceDictionary Source="Views/Styles/Sizes.xaml" />
                 <ResourceDictionary Source="Views/Styles/Controls.xaml" />
             </ResourceDictionary.MergedDictionaries>
