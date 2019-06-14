@@ -4,6 +4,8 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:viewModels="clr-namespace:SOTA.DeviceEmulator.ViewModels"
+             xmlns:logging="clr-namespace:SOTA.DeviceEmulator.Services.Infrastructure.Logging"
+             xmlns:adonisUi="clr-namespace:AdonisUI;assembly=AdonisUI"
              mc:Ignorable="d"
              d:DesignHeight="450"
              d:DesignWidth="800"
@@ -21,7 +23,7 @@
             <TextBlock Grid.Column="0"
                        Text="Logs"
                        Style="{StaticResource SubtitleTextBlock}" />
-            <Button Grid.Column="1">Clear</Button>
+            <Button Grid.Column="1" Name="Clear">Clear</Button>
         </Grid>
         <DataGrid Grid.Row="1"
                   ItemsSource="{Binding Logs, Mode=OneWay}"
@@ -30,9 +32,31 @@
                   IsReadOnly="True"
                   BorderThickness="0"
                   Background="{x:Null}"
-                  GridLinesVisibility="None">
+                  CanUserResizeRows="False"
+                  GridLinesVisibility="None"
+                  SelectionUnit="FullRow">
+            <DataGrid.Resources>
+                <SolidColorBrush x:Key="InformationBrush" Color="LightBlue" Opacity="0.2" />
+                <SolidColorBrush x:Key="WarningBrush" Color="{StaticResource {x:Static adonisUi:Colors.AlertColor}}" Opacity="0.2" />
+                <SolidColorBrush x:Key="ErrorBrush" Color="{StaticResource {x:Static adonisUi:Colors.ErrorColor}}" Opacity="0.2" />
+            </DataGrid.Resources>
+            <DataGrid.RowStyle>
+                <Style TargetType="DataGridRow">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Level}" Value="Information">
+                            <Setter Property="Background" Value="{StaticResource InformationBrush}" />
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding Level}" Value="Warning">
+                            <Setter Property="Background" Value="{StaticResource WarningBrush}"/>
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding Level}" Value="Error">
+                            <Setter Property="Background" Value="{StaticResource ErrorBrush}"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </DataGrid.RowStyle>
             <DataGrid.Columns>
-                <DataGridTextColumn Binding="{Binding Time}" Header="Time" />
+                <DataGridTextColumn Binding="{Binding Time, StringFormat='HH:mm:ss.fff'}" Header="Time" />
                 <DataGridTextColumn Binding="{Binding Level}" Header="Level" />
                 <DataGridTextColumn Binding="{Binding Message}" Header="Message" Width="*" />
             </DataGrid.Columns>

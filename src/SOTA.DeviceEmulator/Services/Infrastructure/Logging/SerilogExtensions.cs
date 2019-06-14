@@ -4,7 +4,7 @@ using Serilog;
 using Serilog.Configuration;
 using Serilog.Events;
 
-namespace SOTA.DeviceEmulator.Infrastructure.Logging
+namespace SOTA.DeviceEmulator.Services.Infrastructure.Logging
 {
     internal static class SerilogExtensions
     {
