@@ -15,7 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SOTA.DeviceEmulator.Core\SOTA.DeviceEmulator.Core.csproj" />
+    <ProjectReference Include="..\..\src\SOTA.DeviceEmulator.Core\SOTA.DeviceEmulator.Core.csproj" />
   </ItemGroup>
 
 </Project>
