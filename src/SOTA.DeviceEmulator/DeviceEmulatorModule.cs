@@ -6,7 +6,6 @@ using MediatR;
 using Microsoft.Extensions.Hosting;
 using Serilog;
 using SOTA.DeviceEmulator.Core;
-using SOTA.DeviceEmulator.Services.Infrastructure;
 using SOTA.DeviceEmulator.Services.Infrastructure.Jobs;
 using SOTA.DeviceEmulator.Services.Infrastructure.Logging;
 using SOTA.DeviceEmulator.ViewModels;
