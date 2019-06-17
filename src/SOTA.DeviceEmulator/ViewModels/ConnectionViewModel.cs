@@ -5,6 +5,9 @@ namespace SOTA.DeviceEmulator.ViewModels
 {
     public sealed class ConnectionViewModel : Screen, ITabViewModel
     {
+        private bool _isConnected;
+        private string _connectButtonText = "Connect";
+
         public ConnectionViewModel()
         {
             DisplayName = "Connection";
@@ -15,14 +18,20 @@ namespace SOTA.DeviceEmulator.ViewModels
 
         public string HeaderText { get; }
 
-        public string ConnectButtonText => _isConnected ? "Disconnect" : "Connect";
-
-        private bool _isConnected;
+        public string ConnectButtonText
+        {
+            get => _connectButtonText;
+            set
+            {
+                _connectButtonText = value;
+                NotifyOfPropertyChange(() => ConnectButtonText);
+            }
+        }
 
         public void Connect()
         {
             _isConnected = !_isConnected;
-            NotifyOfPropertyChange(() => ConnectButtonText);
+            ConnectButtonText = _isConnected ? "Disconnect" : "Connect";
 
             OnConnectionStatusChanged(new ConnectionStatusEventArgs { IsConnected = _isConnected });
         }
