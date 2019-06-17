@@ -2,17 +2,19 @@
 using System.Collections.Generic;
 using GeoAPI.Geometries;
 using NetTopologySuite.Algorithm.Distance;
-using SOTA.DeviceEmulator.Core.Procedures;
+using SOTA.DeviceEmulator.Core.Sensors;
+using SOTA.DeviceEmulator.Core.Sensors.TimeFunctions;
 using Xunit;
 
-namespace SOTA.DeviceEmulator.Core.Tests.Procedures
+namespace SOTA.DeviceEmulator.Core.Tests.Sensors.TimeFunctions
 {
-    public class LocationHarmonicProcedureTest
+    public class LocationHarmonicFunctionTest
     {
         private readonly IPoint _zeroPoint = EarthGeometry.GeometryFactory.CreatePoint(new Coordinate(28.211944, 36.438685));
 
-        private readonly LocationHarmonicProcedure _locationProcedure;
+        private readonly LocationHarmonicFunction _locationFunction;
 
+        // Used for rounding distance in km to 4 digits after a comma.
         private const double DistanceComparisonPrecision = 10000;
 
         // Trajectory circle radius on the earth's surface.
@@ -21,23 +23,23 @@ namespace SOTA.DeviceEmulator.Core.Tests.Procedures
         public static IEnumerable<object[]> Data =>
             new List<object[]>
             {
-                new object[] { TimeSpan.FromHours(0) },
-                new object[] { TimeSpan.FromHours(0.25) },
-                new object[] { TimeSpan.FromHours(0.5) },
-                new object[] { TimeSpan.FromHours(0.75) },
-                new object[] { TimeSpan.FromHours(1) }
+                new object[] { DateTime.MinValue + TimeSpan.FromHours(0) },
+                new object[] { DateTime.MinValue + TimeSpan.FromHours(0.25) },
+                new object[] { DateTime.MinValue + TimeSpan.FromHours(0.5) },
+                new object[] { DateTime.MinValue + TimeSpan.FromHours(0.75) },
+                new object[] { DateTime.MinValue + TimeSpan.FromHours(1) }
             };
 
-        public LocationHarmonicProcedureTest()
+        public LocationHarmonicFunctionTest()
         {
-            _locationProcedure = new LocationHarmonicProcedure();
+            _locationFunction = new LocationHarmonicFunction();
         }
 
         [Theory]
         [MemberData(nameof(Data))]
-        public void Returns_PointOnCircle_When_TimePassed(TimeSpan elapsedTime)
+        public void Returns_PointOnCircle_When_TimePassed(DateTime measuringTime)
         {
-            var result = _locationProcedure.GetValue(elapsedTime);
+            var result = _locationFunction.GetValue(measuringTime);
 
             var distance = new PointPairDistance();
             distance.Initialize(result.Coordinate, _zeroPoint.Coordinate);

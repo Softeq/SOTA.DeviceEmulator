@@ -2,7 +2,7 @@
 using GeoAPI.Geometries;
 using NetTopologySuite;
 
-namespace SOTA.DeviceEmulator.Core
+namespace SOTA.DeviceEmulator.Core.Sensors
 {
     public static class EarthGeometry
     {

@@ -1,51 +1,51 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using FluentAssertions;
 using Moq;
-using SOTA.DeviceEmulator.Core.Procedures;
 using SOTA.DeviceEmulator.Core.Sensors;
-using SOTA.DeviceEmulator.Core.Tests.Stubs;
+using SOTA.DeviceEmulator.Core.Sensors.TimeFunctions;
 using Xunit;
 
 namespace SOTA.DeviceEmulator.Core.Tests.Sensors
 {
     public class PulseSensorTest
     {
+        private static DateTime _measuringTime;
         private const double ProcedureResult = 70;
-        private readonly PulseSensor _pulseSensor;
+        private static Mock<ITimeFunction<double>> _procedureMock;
+        private static PulseSensor _pulseSensor;
 
-        public PulseSensorTest()
+        public static IEnumerable<object[]> GenerateData()
         {
-            var procedure = new Mock<IProcedure<double>>(MockBehavior.Strict);
-            procedure.Setup(i => i.GetValue(It.IsAny<TimeSpan>())).Returns(ProcedureResult);
+            _measuringTime = new DateTime(2019, 10, 10);
+            _procedureMock = new Mock<ITimeFunction<double>>(MockBehavior.Strict);
+            _procedureMock.Setup(i => i.GetValue(_measuringTime)).Returns(ProcedureResult);
 
-            var clock = new TestClock();
+            _pulseSensor = new PulseSensor(_procedureMock.Object);
 
-            _pulseSensor = new PulseSensor(procedure.Object, clock);
+            var noiseFactors = new[] { 1, 2, 3, 4, 5, 10, 20, 30 };
+            var testData = noiseFactors.Select(factor =>
+            {
+                _pulseSensor.NoiseFactor = factor;
+                return new object[]
+                {
+                    factor,
+                    Enumerable.Range(0, 20).Select(i => _pulseSensor.GetValue(_measuringTime)).ToList()
+                };
+            });
+
+            return testData;
         }
 
         [Theory]
-        [InlineData(1)]
-        [InlineData(2)]
-        [InlineData(3)]
-        [InlineData(4)]
-        [InlineData(5)]
-        [InlineData(10)]
-        [InlineData(20)]
-        [InlineData(30)]
-        public void Returns_ValidRandomValue_When_RangePassed(int noiseFactor)
+        [MemberData(nameof(GenerateData))]
+        public void Returns_ValidRandomValue_When_RangePassed(int noiseFactor, IEnumerable<int> pulses)
         {
-            const int valuesCount = 20;
-            var results = new int[valuesCount];
-
-            for (var i = 0; i < valuesCount; i++)
+            foreach (var pulse in pulses)
             {
-                results[i] = _pulseSensor.GetValue(noiseFactor);
+                pulse.Should().BeInRange((int)ProcedureResult - noiseFactor, (int)ProcedureResult + noiseFactor);
             }
-
-            Assert.True(results.All(
-                result =>
-                    result <= ProcedureResult + noiseFactor &&
-                    result >= ProcedureResult - noiseFactor));
         }
     }
 }

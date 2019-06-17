@@ -1,43 +1,40 @@
 ﻿using System;
 using EnsureThat;
-using SOTA.DeviceEmulator.Core.Procedures;
+using SOTA.DeviceEmulator.Core.Sensors.TimeFunctions;
 
 namespace SOTA.DeviceEmulator.Core.Sensors
 {
-    public class PulseSensor : ISensor<int>
+    public class PulseSensor
     {
-        private readonly DateTime _startTime;
-        private readonly IProcedure<double> _procedure;
-        private readonly IClock _clock;
+        public int NoiseFactor = 5;
+
+        private readonly ITimeFunction<double> _function;
         private readonly Random _random;
 
-        public PulseSensor(IProcedure<double> procedure, IClock clock)
+        public PulseSensor(ITimeFunction<double> function)
         {
-            _startTime = clock.UtcNow;
-
-            _procedure = Ensure.Any.IsNotNull(procedure, nameof(procedure));
-            _clock = Ensure.Any.IsNotNull(clock, nameof(clock));
+            _function = Ensure.Any.IsNotNull(function, nameof(function));
             _random = new Random();
         }
 
-        public int GetValue(int noiseFactor)
+        public int GetValue(DateTime currentTime)
         {
-            var deterministicPart = GetDeterministicPart();
-            var randomPart = GetRandomPart(noiseFactor);
+            var deterministicPart = GetDeterministicPart(currentTime);
+            var randomPart = GetRandomPart();
 
             return deterministicPart + randomPart;
         }
 
-        private int GetDeterministicPart()
+        private int GetDeterministicPart(DateTime currentTime)
         {
             return (int)Math.Round(
-                _procedure.GetValue(_clock.UtcNow - _startTime),
+                _function.GetValue(currentTime),
                 MidpointRounding.AwayFromZero);
         }
 
-        private int GetRandomPart(int noiseFactor)
+        private int GetRandomPart()
         {
-            return _random.Next(noiseFactor * -1, noiseFactor);
+            return _random.Next(NoiseFactor * -1, NoiseFactor);
         }
     }
 }

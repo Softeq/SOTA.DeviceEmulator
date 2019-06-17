@@ -1,13 +1,12 @@
 ﻿using System;
 using GeoAPI.Geometries;
-using NetTopologySuite;
 
-namespace SOTA.DeviceEmulator.Core.Procedures
+namespace SOTA.DeviceEmulator.Core.Sensors.TimeFunctions
 {
-    // This procedure generates location data. All points belong to a circle on the earth's surface.
-    public class LocationHarmonicProcedure : IProcedure<IPoint>
+    // This function generates location data. All points belong to a circle on the earth's surface.
+    public class LocationHarmonicFunction : ITimeFunction<IPoint>
     {
-        // Central point of circle trajectory.
+        // Central point of circle trajectory. A lovely place to have a walk in an ancient stadium at the Island of Rhodes.
         private const double ZeroLatitude = 36.438685;
         private const double ZeroLongitude = 28.211944;
 
@@ -16,8 +15,9 @@ namespace SOTA.DeviceEmulator.Core.Procedures
         private double AngleCoefficient => TrajectoryRadius / Math.Sqrt(TrajectoryRadius * TrajectoryRadius + EarthGeometry.EarthRadius * EarthGeometry.EarthRadius);
         protected TimeSpan Period => TimeSpan.FromHours(1);
 
-        public IPoint GetValue(TimeSpan elapsedTime)
+        public IPoint GetValue(DateTime time)
         {
+            var elapsedTime = time - DateTime.MinValue;
             var phase = OscillationMath.CalculatePhase(elapsedTime, Period);
 
             var latitude = ZeroLatitude + OscillationMath.RadianToDegree(AngleCoefficient * Math.Cos(phase));

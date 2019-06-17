@@ -1,57 +1,57 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using FluentAssertions;
 using GeoAPI.Geometries;
 using Moq;
-using SOTA.DeviceEmulator.Core.Procedures;
 using SOTA.DeviceEmulator.Core.Sensors;
-using SOTA.DeviceEmulator.Core.Tests.Stubs;
+using SOTA.DeviceEmulator.Core.Sensors.TimeFunctions;
 using Xunit;
 
 namespace SOTA.DeviceEmulator.Core.Tests.Sensors
 {
     public class LocationSensorTest
     {
-        // Noise step in kilometers.
-        private const double NoiseStep = 0.1;
+        private static DateTime _measuringTime;
+        private static IPoint _procedureResult;
+        private static LocationSensor _locationSensor;
 
-        private readonly IPoint _procedureResult;
-        private readonly LocationSensor _locationSensor;
-
-        public LocationSensorTest()
+        public static IEnumerable<object[]> GenerateData()
         {
-            var procedure = new Mock<IProcedure<IPoint>>(MockBehavior.Strict);
+            _measuringTime = new DateTime(2019, 10, 10);
+            var procedure = new Mock<ITimeFunction<IPoint>>(MockBehavior.Strict);
+
             _procedureResult = EarthGeometry.GeometryFactory.CreatePoint(new Coordinate(0, 0));
+            procedure.Setup(i => i.GetValue(_measuringTime)).Returns(_procedureResult);
+            _locationSensor = new LocationSensor(procedure.Object);
 
-            procedure.Setup(i => i.GetValue(It.IsAny<TimeSpan>())).Returns(_procedureResult);
+            var noiseFactors = new[] {1, 2, 3, 4, 5, 10};
+            var testData = noiseFactors.Select(factor =>
+            {
+                _locationSensor.NoiseFactor = factor;
+                return new object[]
+                {
+                    factor,
+                    Enumerable.Range(0, 20).Select(i => _locationSensor.GetValue(_measuringTime)).ToList()
+                };
+            });
 
-            var clock = new TestClock();
-
-            _locationSensor = new LocationSensor(procedure.Object, clock);
+            return testData;
         }
 
         [Theory]
-        [InlineData(1)]
-        [InlineData(2)]
-        [InlineData(3)]
-        [InlineData(4)]
-        [InlineData(5)]
-        [InlineData(10)]
-        public void Returns_ValidRandomValue_When_RangePassed(int noiseFactor)
+        [MemberData(nameof(GenerateData))]
+        public void Returns_ValidRandomValue_When_RangePassed(int noiseFactor, IEnumerable<IPoint> points)
         {
-            const int valuesCount = 20;
-            var results = new IPoint[valuesCount];
-
-            for (var i = 0; i < valuesCount; i++)
+            foreach (var point in points)
             {
-                results[i] = _locationSensor.GetValue(noiseFactor);
+                point.X.Should().BeInRange(
+                    _procedureResult.X - noiseFactor * LocationSensor.NoiseStep,
+                    _procedureResult.X + noiseFactor * LocationSensor.NoiseStep);
+                point.Y.Should().BeInRange(
+                    _procedureResult.Y - noiseFactor * LocationSensor.NoiseStep,
+                    _procedureResult.Y + noiseFactor * LocationSensor.NoiseStep);
             }
-
-            Assert.True(results.All(
-                result =>
-                    result.X <= _procedureResult.X + noiseFactor * NoiseStep &&
-                    result.X >= _procedureResult.X - noiseFactor * NoiseStep &&
-                    result.Y <= _procedureResult.Y + noiseFactor * NoiseStep &&
-                    result.Y >= _procedureResult.Y - noiseFactor * NoiseStep));
         }
     }
 }

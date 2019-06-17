@@ -1,35 +1,31 @@
 ﻿using System;
 using EnsureThat;
 using GeoAPI.Geometries;
-using SOTA.DeviceEmulator.Core.Procedures;
+using SOTA.DeviceEmulator.Core.Sensors.TimeFunctions;
 
 namespace SOTA.DeviceEmulator.Core.Sensors
 {
-    public class LocationSensor : ISensor<IPoint>
+    public class LocationSensor
     {
         // Noise step in kilometers.
-        private const double NoiseStep = 0.1;
+        public const double NoiseStep = 0.1;
+        public int NoiseFactor = 1;
 
-        private readonly DateTime _startTime;
-        private readonly IProcedure<IPoint> _procedure;
-        private readonly IClock _clock;
+        private readonly ITimeFunction<IPoint> _function;
         private readonly Random _random;
 
-        public LocationSensor(IProcedure<IPoint> procedure, IClock clock)
+        public LocationSensor(ITimeFunction<IPoint> function)
         {
-            _startTime = clock.UtcNow;
-
-            _procedure = Ensure.Any.IsNotNull(procedure, nameof(procedure));
-            _clock = Ensure.Any.IsNotNull(clock, nameof(clock));
+            _function = Ensure.Any.IsNotNull(function, nameof(function));
             _random = new Random();
         }
 
-        public IPoint GetValue(int noiseFactor)
+        public IPoint GetValue(DateTime currentTime)
         {
-            var deterministicPart = _procedure.GetValue(_clock.UtcNow - _startTime);
+            var deterministicPart = _function.GetValue(currentTime);
 
-            var noiseDistanceLat = _random.Next(noiseFactor * -1, noiseFactor) * NoiseStep;
-            var noiseDistanceLon = _random.Next(noiseFactor * -1, noiseFactor) * NoiseStep;
+            var noiseDistanceLat = _random.Next(NoiseFactor * -1, NoiseFactor) * NoiseStep;
+            var noiseDistanceLon = _random.Next(NoiseFactor * -1, NoiseFactor) * NoiseStep;
 
             var pointWithNoise = EarthGeometry.GeometryFactory.CreatePoint(
                 new Coordinate(
