@@ -6,8 +6,6 @@ namespace SOTA.DeviceEmulator.Core.Sensors
 {
     public class PulseSensor
     {
-        public int NoiseFactor = 5;
-
         private readonly ITimeFunction<double> _function;
         private readonly Random _random;
 
@@ -16,6 +14,8 @@ namespace SOTA.DeviceEmulator.Core.Sensors
             _function = Ensure.Any.IsNotNull(function, nameof(function));
             _random = new Random();
         }
+
+        public int NoiseFactor { get; set; } = 5;
 
         public int GetValue(DateTime currentTime)
         {

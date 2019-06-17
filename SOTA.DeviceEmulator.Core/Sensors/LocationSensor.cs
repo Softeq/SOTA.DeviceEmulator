@@ -9,7 +9,6 @@ namespace SOTA.DeviceEmulator.Core.Sensors
     {
         // Noise step in kilometers.
         public const double NoiseStep = 0.1;
-        public int NoiseFactor = 1;
 
         private readonly ITimeFunction<IPoint> _function;
         private readonly Random _random;
@@ -19,6 +18,8 @@ namespace SOTA.DeviceEmulator.Core.Sensors
             _function = Ensure.Any.IsNotNull(function, nameof(function));
             _random = new Random();
         }
+
+        public int NoiseFactor { get; set; } = 1;
 
         public IPoint GetValue(DateTime currentTime)
         {
