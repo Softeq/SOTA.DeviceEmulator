@@ -13,9 +13,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documentation", "Documentat
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SOTA.DeviceEmulator.Core", "SOTA.DeviceEmulator.Core\SOTA.DeviceEmulator.Core.csproj", "{F4B4D2DA-1097-477A-ABBD-4E01532911C0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SOTA.DeviceEmulator.Core", "src\SOTA.DeviceEmulator.Core\SOTA.DeviceEmulator.Core.csproj", "{F4B4D2DA-1097-477A-ABBD-4E01532911C0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SOTA.DeviceEmulator.Core.Tests", "SOTA.DeviceEmulator.Core.Tests\SOTA.DeviceEmulator.Core.Tests.csproj", "{265A5EE9-284B-4192-8258-EF64EF709135}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SOTA.DeviceEmulator.Core.Tests", "test\SOTA.DeviceEmulator.Core.Tests\SOTA.DeviceEmulator.Core.Tests.csproj", "{265A5EE9-284B-4192-8258-EF64EF709135}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
