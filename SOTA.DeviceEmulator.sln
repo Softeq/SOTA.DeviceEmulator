@@ -13,6 +13,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documentation", "Documentat
 		README.md = README.md
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SOTA.DeviceEmulator.Core", "SOTA.DeviceEmulator.Core\SOTA.DeviceEmulator.Core.csproj", "{F4B4D2DA-1097-477A-ABBD-4E01532911C0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SOTA.DeviceEmulator.Core.Tests", "SOTA.DeviceEmulator.Core.Tests\SOTA.DeviceEmulator.Core.Tests.csproj", "{265A5EE9-284B-4192-8258-EF64EF709135}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -23,12 +27,22 @@ Global
 		{B2C3F20C-B53B-4DE2-AE34-87BB6D98B099}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B2C3F20C-B53B-4DE2-AE34-87BB6D98B099}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B2C3F20C-B53B-4DE2-AE34-87BB6D98B099}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F4B4D2DA-1097-477A-ABBD-4E01532911C0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F4B4D2DA-1097-477A-ABBD-4E01532911C0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F4B4D2DA-1097-477A-ABBD-4E01532911C0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F4B4D2DA-1097-477A-ABBD-4E01532911C0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{265A5EE9-284B-4192-8258-EF64EF709135}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{265A5EE9-284B-4192-8258-EF64EF709135}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{265A5EE9-284B-4192-8258-EF64EF709135}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{265A5EE9-284B-4192-8258-EF64EF709135}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{B2C3F20C-B53B-4DE2-AE34-87BB6D98B099} = {61569584-CC86-438C-A389-720169F1416C}
+		{F4B4D2DA-1097-477A-ABBD-4E01532911C0} = {61569584-CC86-438C-A389-720169F1416C}
+		{265A5EE9-284B-4192-8258-EF64EF709135} = {61569584-CC86-438C-A389-720169F1416C}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {9FA9F07C-759F-4351-8FBF-4D597C0D70C2}

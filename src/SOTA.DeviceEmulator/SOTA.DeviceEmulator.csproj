@@ -157,7 +157,6 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="DeviceEmulatorModule.cs" />
-    <Compile Include="Services\Infrastructure\IClock.cs" />
     <Compile Include="Services\Infrastructure\Jobs\IToggleable.cs" />
     <Compile Include="Services\Infrastructure\Jobs\ToggleableMediatorServiceFactory.cs" />
     <Compile Include="Services\Infrastructure\Jobs\SystemClock.cs" />
@@ -262,6 +261,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\SOTA.DeviceEmulator.Core\SOTA.DeviceEmulator.Core.csproj">
+      <Project>{f4b4d2da-1097-477a-abbd-4e01532911c0}</Project>
+      <Name>SOTA.DeviceEmulator.Core</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

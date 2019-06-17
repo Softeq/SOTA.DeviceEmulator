@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using EnsureThat;
 using Microsoft.Extensions.Hosting;
 using Serilog;
+using SOTA.DeviceEmulator.Core;
 
 namespace SOTA.DeviceEmulator.Services.Infrastructure.Jobs
 {

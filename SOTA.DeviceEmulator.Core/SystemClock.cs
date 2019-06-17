@@ -1,7 +1,6 @@
 ﻿using System;
-using SOTA.DeviceEmulator.Core;
 
-namespace SOTA.DeviceEmulator.Services.Infrastructure.Jobs
+namespace SOTA.DeviceEmulator.Core
 {
     internal class SystemClock : IClock
     {

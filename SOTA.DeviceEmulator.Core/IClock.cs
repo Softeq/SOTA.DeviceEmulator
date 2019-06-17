@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SOTA.DeviceEmulator.Services.Infrastructure
+namespace SOTA.DeviceEmulator.Core
 {
     public interface IClock
     {
