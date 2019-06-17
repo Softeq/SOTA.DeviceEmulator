@@ -7,7 +7,7 @@
              d:DesignWidth="800">
     <StatusBar Height="30" Padding="{StaticResource ThicknessMediumLeftRight}">
         <StatusBarItem>
-            <TextBlock Text="Content on the left" />
+            <TextBlock Text="{Binding ConnectionStatus, Mode=OneWay}" />
         </StatusBarItem>
         <StatusBarItem HorizontalAlignment="Right">
             <TextBlock Text="Content on the right" />

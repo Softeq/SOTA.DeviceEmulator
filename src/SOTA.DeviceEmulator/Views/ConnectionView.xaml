@@ -6,5 +6,44 @@
              xmlns:local="clr-namespace:SOTA.DeviceEmulator.Views"
              mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="800">
-    <TextBlock Text="Connection view is supposed to be here" />
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <TextBlock Grid.Row="0"
+            Text="{Binding HeaderText}"
+            Style="{StaticResource SubtitleTextBlock}" />
+        <Grid Grid.Row="1" Margin="{StaticResource ThicknessLargeTop}">
+            <Grid.Resources>
+                <Style TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type Button}}">
+                    <Setter Property="Margin" Value="{StaticResource ThicknessSmallAllSides}"/>
+                </Style>
+                <Style TargetType="{x:Type TextBlock}" BasedOn="{StaticResource {x:Type TextBlock}}">
+                    <Setter Property="Margin" Value="{StaticResource ThicknessSmallAllSides}"/>
+                </Style>
+                <Style TargetType="{x:Type ComboBox}" BasedOn="{StaticResource {x:Type ComboBox}}">
+                    <Setter Property="Margin" Value="{StaticResource ThicknessSmallAllSides}"/>
+                </Style>
+            </Grid.Resources>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Text="Environment"/>
+            <ComboBox Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="3"/>
+            <TextBlock Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Text="Device Certificate"/>
+            <TextBox Grid.Row="1" Grid.Column="1" IsReadOnly="True" Margin="{StaticResource ThicknessSmallAllSides}"/>
+            <Button Grid.Row="1" Grid.Column="2">Browse</Button>
+            <Button Grid.Row="1" Grid.Column="3">Create New</Button>
+            <Button Grid.Row="2" Grid.Column="0" Name="Connect" Margin="{StaticResource ThicknessLargeTop}" Content="{Binding ConnectButtonText}"/>
+        </Grid>
+    </Grid>
 </UserControl>
