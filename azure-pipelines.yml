@@ -1,19 +1,30 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
-
+variables:
+  verbosity: Minimal
 trigger:
 - master
-
-pool:
-  vmImage: 'ubuntu-latest'
-
-steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
-
-- script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
+- develop
+- release/*
+- hotfix/*
+jobs:
+  - job: BuildApplication
+    displayName: Build application
+    pool:
+      vmImage: 'windows-2019'
+    steps:
+    - task: PowerShell@2
+      displayName: Invoke Nuke to package the application
+      inputs:
+        filePath: "build.ps1"
+        arguments: "CiBuild --Verbosity $(verbosity)"
+    - task: CopyFiles@2
+      displayName: Copy artifacts
+      condition: ne(variables['Build.Reason'], 'PullRequest')
+      inputs:
+        contents: 'artifacts/SOTA.DeviceEmulator/**'
+        targetFolder: $(Build.ArtifactStagingDirectory)
+    - task: PublishBuildArtifacts@1
+      displayName: Publish artifacts
+      condition: ne(variables['Build.Reason'], 'PullRequest')
+      inputs: 
+        pathtoPublish: '$(Build.ArtifactStagingDirectory)'
+        artifactName: ClickOncePackage
