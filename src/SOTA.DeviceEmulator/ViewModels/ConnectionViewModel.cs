@@ -1,5 +1,4 @@
-﻿using System;
-using System.IO;
+using System;
 using System.Threading.Tasks;
 using System.Windows;
 using Caliburn.Micro;
@@ -21,8 +20,8 @@ namespace SOTA.DeviceEmulator.ViewModels
 
         public string HeaderText { get; }
 
-        public bool IsConnectAllowed => !string.IsNullOrEmpty(_certificatePath);
-        public bool IsChangeCertificateAllowed => !_isConnected;
+        public bool CanConnect => !string.IsNullOrEmpty(_certificatePath);
+        public bool CanBrowseFiles => !_isConnected;
 
 
         public bool IsConnected
@@ -32,7 +31,7 @@ namespace SOTA.DeviceEmulator.ViewModels
             {
                 _isConnected = value;
                 NotifyOfPropertyChange(() => IsConnected);
-                NotifyOfPropertyChange(() => IsChangeCertificateAllowed);
+                NotifyOfPropertyChange(() => CanBrowseFiles);
             }
         }
 
@@ -43,7 +42,7 @@ namespace SOTA.DeviceEmulator.ViewModels
             {
                 _certificatePath = value;
                 NotifyOfPropertyChange(() => CertificatePath);
-                NotifyOfPropertyChange(() => IsConnectAllowed);
+                NotifyOfPropertyChange(() => CanConnect);
             }
         }
 
@@ -64,13 +63,13 @@ namespace SOTA.DeviceEmulator.ViewModels
             }
             catch (Exception e)
             {
-                MessageBox.Show(e.Message, "Error");
+                MessageBox.Show(e.Message, "Connection Error");
             }
         }
 
         public void BrowseFiles()
         {
-            Microsoft.Win32.OpenFileDialog dialog = new Microsoft.Win32.OpenFileDialog
+            var dialog = new Microsoft.Win32.OpenFileDialog
             {
                 FileName = "Certificate",
                 DefaultExt = ".pfx",

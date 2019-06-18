@@ -186,8 +186,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Converters\ConnectionStatusBooleanToTextConverter.cs" />
-    <Compile Include="Converters\ConnectionStatusTextType.cs" />
+    <Compile Include="ViewModels\Converters\ConnectionStatusBooleanToTextConverter.cs" />
+    <Compile Include="ViewModels\Converters\ConnectionStatusTextType.cs" />
     <Compile Include="DeviceEmulatorModule.cs" />
     <Compile Include="Services\Infrastructure\Jobs\IToggleable.cs" />
     <Compile Include="Services\Infrastructure\Jobs\ToggleableMediatorServiceFactory.cs" />

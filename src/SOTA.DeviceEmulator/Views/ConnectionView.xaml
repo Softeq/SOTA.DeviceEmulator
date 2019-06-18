@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="SOTA.DeviceEmulator.Views.ConnectionView"
+<UserControl x:Class="SOTA.DeviceEmulator.Views.ConnectionView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -23,40 +23,37 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="20"/>
                 <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
             <Border Grid.Row="0" Grid.Column="0">
                 <TextBlock VerticalAlignment="Center" Text="Environment"/>
             </Border>
-            <Border Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="3">
+            <Border Grid.Row="0" Grid.Column="2">
                 <ComboBox/>
             </Border>
             <Border Grid.Row="1" Grid.Column="0">
                 <TextBlock VerticalAlignment="Center" Text="Device Certificate"/>
             </Border>
-            <Border Grid.Row="1" Grid.Column="1">
-                <TextBox IsReadOnly="True" Text="{Binding CertificatePath}"/>
-            </Border>
             <Border Grid.Row="1" Grid.Column="2">
-                <Button Name="BrowseFiles" IsEnabled="{Binding IsChangeCertificateAllowed}">Browse</Button>
-            </Border>
-            <Border Grid.Row="1" Grid.Column="3">
-                <Button IsEnabled="{Binding IsChangeCertificateAllowed}">Create New</Button>
-            </Border>
-            <Border Grid.Row="2" Grid.Column="0">
-                <Button Name="Connect"
-                    Content="{Binding IsConnected,
-                    Mode=OneWay,
-                    Converter={StaticResource ConnectionStatusBooleanToTextConverter},
-                    ConverterParameter='ButtonLabel'}"
-                    IsEnabled="{Binding IsConnectAllowed}"/>
+                <DockPanel LastChildFill="True">
+                    <Button DockPanel.Dock="Right">Create New</Button>
+                    <Button Name="BrowseFiles" DockPanel.Dock="Right">Browse</Button>
+                    <TextBox IsReadOnly="True" Text="{Binding CertificatePath}"/>
+                </DockPanel>
             </Border>
         </Grid>
+        <WrapPanel Margin="{StaticResource ThicknessSmallAllSides}">
+            <Button Name="Connect"
+                    DockPanel.Dock="Left"
+                    Content="{Binding IsConnected,
+                        Mode=OneWay,
+                        Converter={StaticResource ConnectionStatusBooleanToTextConverter},
+                        ConverterParameter='ButtonLabel'}"
+            />
+        </WrapPanel>
     </StackPanel>
 </UserControl>

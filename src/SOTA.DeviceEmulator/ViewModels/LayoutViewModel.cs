@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using Caliburn.Micro;
 using EnsureThat;
@@ -20,7 +20,7 @@ namespace SOTA.DeviceEmulator.ViewModels
             Items.AddRange(tabViewModels);
             StatusBar = statusBarViewModel;
 
-            var connectionViewModel = (ConnectionViewModel)tabViewModels.FirstOrDefault(i => i is ConnectionViewModel);
+            var connectionViewModel = tabViewModels.OfType<ConnectionViewModel>().FirstOrDefault();
             Ensure.Any.IsNotNull(connectionViewModel, nameof(connectionViewModel));
 
             connectionViewModel.ConnectionStatusChanged += statusBarViewModel.ToggleConnectionStatus;
