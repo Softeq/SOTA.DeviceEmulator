@@ -1,8 +1,8 @@
-﻿using System;
+using System;
 using System.Globalization;
 using System.Windows.Data;
 
-namespace SOTA.DeviceEmulator.Converters
+namespace SOTA.DeviceEmulator.ViewModels.Converters
 {
     public class ConnectionStatusBooleanToTextConverter : IValueConverter
     {

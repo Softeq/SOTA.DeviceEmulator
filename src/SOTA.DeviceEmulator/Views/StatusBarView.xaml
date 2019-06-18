@@ -1,13 +1,13 @@
-﻿<UserControl x:Class="SOTA.DeviceEmulator.Views.StatusBarView"
+<UserControl x:Class="SOTA.DeviceEmulator.Views.StatusBarView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:c="clr-namespace:SOTA.DeviceEmulator.Converters"
+             xmlns:converters="clr-namespace:SOTA.DeviceEmulator.ViewModels.Converters"
              mc:Ignorable="d"
              d:DesignWidth="800">
     <UserControl.Resources>
-        <c:ConnectionStatusBooleanToTextConverter x:Key="ConnectionStatusBooleanToTextConverter"/>
+        <converters:ConnectionStatusBooleanToTextConverter x:Key="ConnectionStatusBooleanToTextConverter"/>
     </UserControl.Resources>
     <StatusBar Height="30" Padding="{StaticResource ThicknessMediumLeftRight}">
         <StatusBarItem>
