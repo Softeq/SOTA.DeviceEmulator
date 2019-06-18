@@ -186,6 +186,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Views\Converters\ConnectionStatusBooleanToTextConverter.cs" />
+    <Compile Include="Views\Converters\ConnectionStatusTextType.cs" />
     <Compile Include="DeviceEmulatorModule.cs" />
     <Compile Include="Services\Infrastructure\Jobs\IToggleable.cs" />
     <Compile Include="Services\Infrastructure\Jobs\ToggleableMediatorServiceFactory.cs" />
@@ -202,6 +204,7 @@
     <Compile Include="Services\Telemetry\TelemetryCollectionHandler.cs" />
     <Compile Include="Services\Telemetry\TelemetryCollectionTimerRule.cs" />
     <Compile Include="Services\Telemetry\TelemetryReportingHandler.cs" />
+    <Compile Include="ViewModels\ConnectionStatusChangedEventArgs.cs" />
     <Compile Include="ViewModels\ConnectionViewModel.cs" />
     <Compile Include="ViewModels\ITabViewModel.cs" />
     <Compile Include="ViewModels\LayoutViewModel.cs" />

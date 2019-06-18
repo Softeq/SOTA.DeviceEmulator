@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
+using System.Linq;
 using Caliburn.Micro;
 using EnsureThat;
 
@@ -13,10 +14,19 @@ namespace SOTA.DeviceEmulator.ViewModels
             StatusBar = Ensure.Any.IsNotNull(statusBarViewModel, nameof(statusBarViewModel));
             Ensure.Any.IsNotNull(tabs, nameof(tabs));
 
+            var tabViewModels = tabs as ITabViewModel[] ?? tabs.ToArray();
+
             DeviceDisplayName = "Device name will be here.";
-            Items.AddRange(tabs);
+            Items.AddRange(tabViewModels);
             StatusBar = statusBarViewModel;
+
+            var connectionViewModel = tabViewModels.OfType<ConnectionViewModel>().FirstOrDefault();
+            Ensure.Any.IsNotNull(connectionViewModel, nameof(connectionViewModel));
+
+            connectionViewModel.ConnectionStatusChanged += statusBarViewModel.ToggleConnectionStatus;
         }
+
+        
 
         public string DeviceDisplayName { get; }
 

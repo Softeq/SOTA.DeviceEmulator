@@ -20,9 +20,9 @@
             Text="{Binding DeviceDisplayName}" />
         <Grid Grid.Row="1" Margin="{StaticResource ThicknessMediumLeftRight}">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="1*" />
-                <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="3*" />
             </Grid.ColumnDefinitions>
             <TabControl Grid.Column="0" Name="Items" BorderThickness="0" Background="{x:Null}" />
             <GridSplitter Grid.Column="1"
