@@ -265,3 +265,6 @@ AssemblyVersionInfo.cs
 
 # Artifacts directory
 /artifacts
+
+# Temporary code signing keys
+!*TemporaryKey.pfx

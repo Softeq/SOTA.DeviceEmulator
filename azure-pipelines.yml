@@ -16,7 +16,7 @@ stages:
         vmImage: 'windows-2019'
       steps:
       - task: PowerShell@2
-        displayName: Invoke Nuke to package the application
+        displayName: Build application package
         inputs:
           filePath: "build.ps1"
           arguments: "CiBuild --Verbosity $(verbosity)"

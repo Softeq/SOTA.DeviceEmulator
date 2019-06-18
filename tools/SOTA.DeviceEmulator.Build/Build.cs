@@ -57,7 +57,7 @@ class Build : NukeBuild
                                MSBuild(o =>
                                    o.SetProjectFile(EntryProject)
                                     .SetConfiguration(Configuration)
-                                    .SetTargets("Build,Publish")
+                                    .SetTargets("Publish")
                                     .AddProperty("PublishDir", PackageDirectory + "\\")
                                     .AddProperty("ProductName", Metadata.ClickOnceProductName)
                                     .AddProperty("ApplicationVersion", Metadata.ClickOnceApplicationVersion)
