@@ -3,11 +3,11 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:converters="clr-namespace:SOTA.DeviceEmulator.ViewModels.Converters"
+             xmlns:converters1="clr-namespace:SOTA.DeviceEmulator.Views.Converters"
              mc:Ignorable="d"
              d:DesignWidth="800">
     <UserControl.Resources>
-        <converters:ConnectionStatusBooleanToTextConverter x:Key="ConnectionStatusBooleanToTextConverter"/>
+        <converters1:ConnectionStatusBooleanToTextConverter x:Key="ConnectionStatusBooleanToTextConverter"/>
     </UserControl.Resources>
     <StatusBar Height="30" Padding="{StaticResource ThicknessMediumLeftRight}">
         <StatusBarItem>

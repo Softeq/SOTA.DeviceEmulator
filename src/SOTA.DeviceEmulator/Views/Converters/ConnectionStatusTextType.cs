@@ -1,4 +1,4 @@
-namespace SOTA.DeviceEmulator.ViewModels.Converters
+namespace SOTA.DeviceEmulator.Views.Converters
 {
     public enum ConnectionStatusTextType
     {
