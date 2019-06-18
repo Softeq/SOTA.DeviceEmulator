@@ -7,18 +7,20 @@ class BuildMetadata
     public BuildMetadata(GitVersion gitVersion)
     {
         var nameParts = new List<string> {"SOTA Device Emulator"};
-        var releaseType = CultureInfo.InvariantCulture.TextInfo.ToTitleCase(gitVersion.PreReleaseLabel ?? "Stable");
+        ReleaseType = gitVersion.PreReleaseLabel ?? "stable";
+        var releaseTypeTitle = CultureInfo.InvariantCulture.TextInfo.ToTitleCase(ReleaseType);
         if (!string.IsNullOrEmpty(gitVersion.PreReleaseLabel))
         {
-            nameParts.Add(releaseType);
+            nameParts.Add(releaseTypeTitle);
         }
         ClickOnceProductName = string.Join(" ", nameParts);
         ClickOnceApplicationVersion = $"{gitVersion.MajorMinorPatch}.{gitVersion.PreReleaseNumber}";
-        EntryAssemblyName = $"SOTA.DeviceEmulator.{releaseType}";
+        EntryAssemblyName = $"SOTA.DeviceEmulator.{releaseTypeTitle}";
     }
 
     public string ClickOnceProductName { get; private set; }
     public string ClickOnceApplicationVersion { get; private set; }
     // We need a different assembly name to allow side-by-side installation of versions from different channels (alpha, beta, stable) in ClickOnce.
     public string EntryAssemblyName { get; private set; }
+    public string ReleaseType { get; private set; }
 }

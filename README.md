@@ -10,6 +10,8 @@ Make sure that the following dependencies are installed:
 
 * [Visual Studio 2019](https://visualstudio.microsoft.com/downloads/)
 * [.NET Core 2.2 SDK](https://dotnet.microsoft.com/download/dotnet-core)
+* [Azure CLI](https://docs.microsoft.com/en-us/cli/azure)
+* [Terraform](https://chocolatey.org/packages/terraform)
 
 Also, there are several extensions and applications that you may find useful during development:
 
@@ -23,4 +25,37 @@ After installing all required dependencies, make sure you can build the project 
 ./build
 # Or you can do the same with
 ./build LocalBuild
+```
+
+## Deployment
+
+The application is built as a ClickOnce package and published to an Azure Blob storage.
+
+Make sure the necessary resources are created in an Azure subscription:
+
+* Resource group named `sota`
+* Blob storage account named `sotaops`
+* Blob storage container named `terraform-state`
+
+You can use the following command samples to create all listed things:
+
+```powershell
+# Login and select subscription
+az login
+az account set --subscription <your-subscription-id>
+
+# Create resource group
+az group create --name sota --location eastus
+
+# Create blob storage account
+az storage account create --name sotaops --resource-group sota --location eastus --sku Standard_LRS
+
+# Create blob storage container
+az storage container create --name terraform-state --account-name sotaops
+```
+
+Then, use deploy script to upload artifacts to the blob storage
+
+```powershell
+./build Deploy
 ```
