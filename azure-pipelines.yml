@@ -1,3 +1,6 @@
+variables:
+  - name: verbosity
+    value: Normal
 trigger:
 - master
 - develop
