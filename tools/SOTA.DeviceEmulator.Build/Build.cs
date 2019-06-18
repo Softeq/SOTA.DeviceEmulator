@@ -1,4 +1,5 @@
 using Nuke.Common;
+using Nuke.Common.BuildServers;
 using Nuke.Common.Execution;
 using Nuke.Common.ProjectModel;
 using Nuke.Common.Tooling;
@@ -49,9 +50,14 @@ class Build : NukeBuild
         .Executes(() =>
         {
             var assemblyVersionFilePath = EntryProject.Directory / "Properties" / "AssemblyVersionInfo.cs";
-            GitVersion(o =>
-                o.SetEnsureAssemblyInfo(true)
-                 .SetArgumentConfigurator(a => a.Add($"/updateassemblyinfo \"{assemblyVersionFilePath}\"")));
+            var gitVersion = GitVersion(o =>
+                    o.SetEnsureAssemblyInfo(true)
+                     .SetArgumentConfigurator(a => a.Add($"/updateassemblyinfo \"{assemblyVersionFilePath}\"")))
+                .Result;
+            if (TeamServices.Instance != null)
+            {
+                TeamServices.Instance.UpdateBuildNumber(gitVersion.FullSemVer);
+            }
         });
 
     Target Package => _ => _
@@ -75,7 +81,16 @@ class Build : NukeBuild
                             var testProjects = Solution.GetProjects("*.Tests");
                             foreach (var testProject in testProjects)
                             {
-                                DotNetTest(o => o.SetProjectFile(testProject).SetNoRestore(true));
+                                DotNetTest(o =>
+                                {
+                                    var config = o.SetProjectFile(testProject).SetNoRestore(true);
+                                    if (TeamServices.Instance != null)
+                                    {
+                                        var testResultsFile = Solution.Directory / "TestResults" / $"{testProject.Name}.TestResults.trx";
+                                        config = config.SetLogger($"trx;LogFileName={testResultsFile}");
+                                    }
+                                    return config;
+                                });
                             }
                         });
 

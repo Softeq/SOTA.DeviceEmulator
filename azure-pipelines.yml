@@ -16,10 +16,16 @@ stages:
         vmImage: 'windows-2019'
       steps:
       - task: PowerShell@2
-        displayName: Build application package
+        displayName: Test and build application package
         inputs:
           filePath: "build.ps1"
           arguments: "CiBuild --Verbosity $(verbosity)"
+      - task: PublishTestResults@2
+        displayName: Publish test results
+        inputs:
+          testRunner: VSTest
+          testResultsFiles: 'TestResults/**/*.trx'
+          failTaskOnFailedTests: true
       - task: CopyFiles@2
         displayName: Copy artifacts
         condition: ne(variables['Build.Reason'], 'PullRequest')
