@@ -5,11 +5,13 @@ using Nuke.Common.Tooling;
 using Nuke.Common.Tools.DotNet;
 using Nuke.Common.Tools.GitVersion;
 using Nuke.Common.Tools.MSBuild;
+using Nuke.Common.Tools.NuGet;
 using static Nuke.Common.IO.FileSystemTasks;
 using static Nuke.Common.IO.PathConstruction;
 using static Nuke.Common.Tools.DotNet.DotNetTasks;
 using static Nuke.Common.Tools.MSBuild.MSBuildTasks;
 using static Nuke.Common.Tools.GitVersion.GitVersionTasks;
+using static Nuke.Common.Tools.NuGet.NuGetTasks;
 
 [CheckBuildProjectConfigurations]
 [UnsetVisualStudioEnvironmentVariables]
@@ -25,6 +27,7 @@ class Build : NukeBuild
     Project EntryProject => Solution.GetProject("SOTA.DeviceEmulator");
 
     AbsolutePath ArtifactsDirectory => RootDirectory / "artifacts";
+    AbsolutePath NuGetPackagesDirectory => RootDirectory / "packages";
     AbsolutePath PackageDirectory => ArtifactsDirectory / "SOTA.DeviceEmulator";
 
     Target Clean => _ => _
@@ -32,14 +35,14 @@ class Build : NukeBuild
                          .Executes(() =>
                          {
                              EnsureCleanDirectory(ArtifactsDirectory);
+                             EnsureCleanDirectory(NuGetPackagesDirectory);
                              DotNetClean(o => o.SetProject(Solution));
                          });
 
     Target Restore => _ => _
         .Executes(() =>
         {
-            DotNetRestore(o => o.SetProjectFile(Solution));
-            MSBuild(o => o.SetProjectFile(EntryProject).SetTargets("Restore"));
+            NuGetRestore(o => o.SetSolutionDirectory(Solution.Directory));
         });
 
     Target SetVersion => _ => _
