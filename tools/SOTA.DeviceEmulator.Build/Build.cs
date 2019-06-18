@@ -13,8 +13,6 @@ using static Nuke.Common.Tools.GitVersion.GitVersionTasks;
 
 [CheckBuildProjectConfigurations]
 [UnsetVisualStudioEnvironmentVariables]
-[DotNetVerbosityMapping]
-[MSBuildVerbosityMapping]
 class Build : NukeBuild
 {
     [Parameter("Configuration to build - Default is 'Debug' (local) or 'Release' (server)")]
@@ -59,7 +57,7 @@ class Build : NukeBuild
                                MSBuild(o =>
                                    o.SetProjectFile(EntryProject)
                                     .SetConfiguration(Configuration)
-                                    .SetTargets("Publish")
+                                    .SetTargets("Build,Publish")
                                     .AddProperty("PublishDir", PackageDirectory + "\\")
                                     .AddProperty("ProductName", Metadata.ClickOnceProductName)
                                     .AddProperty("ApplicationVersion", Metadata.ClickOnceApplicationVersion)
