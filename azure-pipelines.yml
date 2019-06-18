@@ -1,0 +1,40 @@
+variables:
+  - name: verbosity
+    value: Normal
+trigger:
+- master
+- develop
+- release/*
+- hotfix/*
+stages:
+- stage: Build
+  displayName: Build application ClickOnce package
+  jobs:
+    - job: BuildApplication
+      displayName: Build application
+      pool:
+        vmImage: 'windows-2019'
+      steps:
+      - task: PowerShell@2
+        displayName: Test and build application package
+        inputs:
+          filePath: "build.ps1"
+          arguments: "CiBuild --Verbosity $(verbosity)"
+      - task: PublishTestResults@2
+        displayName: Publish test results
+        inputs:
+          testRunner: VSTest
+          testResultsFiles: 'TestResults/**/*.trx'
+          failTaskOnFailedTests: true
+      - task: CopyFiles@2
+        displayName: Copy artifacts
+        condition: ne(variables['Build.Reason'], 'PullRequest')
+        inputs:
+          contents: 'artifacts/SOTA.DeviceEmulator/**'
+          targetFolder: $(Build.ArtifactStagingDirectory)
+      - task: PublishBuildArtifacts@1
+        displayName: Publish artifacts
+        condition: ne(variables['Build.Reason'], 'PullRequest')
+        inputs: 
+          pathtoPublish: '$(Build.ArtifactStagingDirectory)'
+          artifactName: ClickOncePackage
