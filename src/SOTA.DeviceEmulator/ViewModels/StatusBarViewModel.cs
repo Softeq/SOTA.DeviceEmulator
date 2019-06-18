@@ -4,21 +4,17 @@ namespace SOTA.DeviceEmulator.ViewModels
 {
     public class StatusBarViewModel : PropertyChangedBase
     {
-        private string _connectionStatus = "Offline";
+        private bool _isConnected;
 
-        public string ConnectionStatus
+        public bool IsConnected
         {
-            get => _connectionStatus;
-            set
-            {
-                _connectionStatus = value;
-                NotifyOfPropertyChange(() => ConnectionStatus);
-            }
+            get => _isConnected;
+            set => Set(ref _isConnected, value, nameof(IsConnected));
         }
 
-        public void ConnectionStatusChanged(object sender, ConnectionViewModel.ConnectionStatusEventArgs e)
+        public void ToggleConnectionStatus(object sender, ConnectionStatusChangedEventArgs @event)
         {
-            ConnectionStatus = e.IsConnected ? "Online" : "Offline";
+            IsConnected = @event.IsConnected;
         }
     }
 }

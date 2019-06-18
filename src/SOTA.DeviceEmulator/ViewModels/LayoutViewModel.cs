@@ -21,10 +21,9 @@ namespace SOTA.DeviceEmulator.ViewModels
             StatusBar = statusBarViewModel;
 
             var connectionViewModel = (ConnectionViewModel)tabViewModels.FirstOrDefault(i => i is ConnectionViewModel);
-            if (connectionViewModel != null)
-            {
-                connectionViewModel.ConnectionStatusChanged += statusBarViewModel.ConnectionStatusChanged;
-            }
+            Ensure.Any.IsNotNull(connectionViewModel, nameof(connectionViewModel));
+
+            connectionViewModel.ConnectionStatusChanged += statusBarViewModel.ToggleConnectionStatus;
         }
 
         

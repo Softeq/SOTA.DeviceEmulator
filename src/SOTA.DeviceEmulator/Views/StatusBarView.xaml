@@ -3,11 +3,33 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:c="clr-namespace:SOTA.DeviceEmulator.Converters"
              mc:Ignorable="d"
              d:DesignWidth="800">
+    <UserControl.Resources>
+        <c:ConnectionStatusBooleanToTextConverter x:Key="ConnectionStatusBooleanToTextConverter"/>
+    </UserControl.Resources>
     <StatusBar Height="30" Padding="{StaticResource ThicknessMediumLeftRight}">
         <StatusBarItem>
-            <TextBlock Text="{Binding ConnectionStatus, Mode=OneWay}" />
+            <StackPanel Orientation="Horizontal">
+                <Ellipse
+                    Fill="{Binding IsConnected,
+                    Mode=OneWay,
+                    Converter={StaticResource ConnectionStatusBooleanToTextConverter},
+                    ConverterParameter='Color'}"
+                    Height="10"
+                    Width="10"
+                    Margin="{StaticResource ThicknessSmallLeftRight}"/>
+                <TextBlock
+                    Text="{Binding IsConnected,
+                    Mode=OneWay,
+                    Converter={StaticResource ConnectionStatusBooleanToTextConverter},
+                    ConverterParameter='InfoLabel'}"
+                    Foreground="{Binding IsConnected,
+                    Mode=OneWay,
+                    Converter={StaticResource ConnectionStatusBooleanToTextConverter},
+                    ConverterParameter='Color'}"/>
+            </StackPanel>
         </StatusBarItem>
         <StatusBarItem HorizontalAlignment="Right">
             <TextBlock Text="Content on the right" />
