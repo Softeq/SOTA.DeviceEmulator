@@ -1,6 +1,8 @@
+using System.Linq;
 using Nuke.Common;
 using Nuke.Common.BuildServers;
 using Nuke.Common.Execution;
+using Nuke.Common.IO;
 using Nuke.Common.ProjectModel;
 using Nuke.Common.Tooling;
 using Nuke.Common.Tools.DotNet;
@@ -72,6 +74,17 @@ class Build : NukeBuild
                                     .AddProperty("ProductName", Metadata.ClickOnceProductName)
                                     .AddProperty("ApplicationVersion", Metadata.ClickOnceApplicationVersion)
                                     .AddProperty("EntryAssemblyName", Metadata.EntryAssemblyName));
+                               // Application manifest file (.application) is not generated when publish package is generated
+                               // using MSBuild. But we need it for an ability to install older versions
+                               // So we apply a hack to copy it manually similarly to this answer in StackOverflow
+                               // https://stackoverflow.com/questions/23221089/missing-manifest-file-in-applicationfiles-folder-with-msbuild-in-nant-task
+                               var applicationManifestFile = GlobFiles(PackageDirectory, "*.application").First();
+                               var clickOnceUnderscoreVersion = Metadata.ClickOnceApplicationVersion.Replace(".", "_");
+                               var clickOnceVersionFolderName =
+                                   $"{Metadata.EntryAssemblyName}_{clickOnceUnderscoreVersion}";
+                               var versionedApplicationDirectory =
+                                   PackageDirectory / "Application Files" / clickOnceVersionFolderName;
+                               CopyFileToDirectory(applicationManifestFile, versionedApplicationDirectory, FileExistsPolicy.Overwrite);
                            });
 
     Target Test => _ => _
@@ -84,11 +97,12 @@ class Build : NukeBuild
                                 DotNetTest(o =>
                                 {
                                     var config = o.SetProjectFile(testProject).SetNoRestore(true);
-                                    if (TeamServices.Instance != null)
+                                    if (TeamServices.Instance == null)
                                     {
-                                        var testResultsFile = Solution.Directory / "TestResults" / $"{testProject.Name}.TestResults.trx";
-                                        config = config.SetLogger($"trx;LogFileName={testResultsFile}");
+                                        return config;
                                     }
+                                    var testResultsFile = Solution.Directory / "TestResults" / $"{testProject.Name}.TestResults.trx";
+                                    config = config.SetLogger($"trx;LogFileName={testResultsFile}");
                                     return config;
                                 });
                             }

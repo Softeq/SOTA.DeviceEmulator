@@ -1,5 +1,7 @@
 # SOTA Device Emulator
 
+[![Build Status](https://dev.azure.com/SofteqDevelopment/SOTA/_apis/build/status/Device%20Emulator?branchName=develop)](https://dev.azure.com/SofteqDevelopment/SOTA/_build/latest?definitionId=49&branchName=develop)
+
 A desktop application that emulates a device in an IoT scenario. The repository belongs to the [SOTA](https://portal.softeq.com/display/SOTA) project.
 
 ## Development
