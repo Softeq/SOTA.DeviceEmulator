@@ -42,6 +42,11 @@ stages:
   jobs:
     - job: PublishArtifacts
       steps:
+      - task: PowerShell@2
+        displayName: Set release version
+        inputs:
+          filePath: "build.ps1"
+          arguments: "SetVersion --Verbosity $(verbosity)"
       - task: DownloadBuildArtifacts@0
         inputs:
           buildType: 'current'
