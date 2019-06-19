@@ -36,7 +36,7 @@ stages:
       # condition: ne(variables['Build.Reason'], 'PullRequest')
       inputs: 
         pathtoPublish: '$(Build.ArtifactStagingDirectory)'
-        artifactName: ClickOncePackage
+        artifactName: ApplicationBinaries
 - stage: Release
   jobs:
     - job: ReleaseApplication
@@ -54,7 +54,7 @@ stages:
         inputs:
           buildType: 'current'
           downloadType: 'single'
-          artifactName: ClickOncePackage
+          artifactName: ApplicationBinaries
           downloadPath: '$(System.ArtifactsDirectory)'
       - task: UniversalPackages@0
         displayName: Publish universal package
@@ -65,4 +65,4 @@ stages:
           vstsFeedPackagePublish: sota-deviceemulator
           versionOption: custom
           versionPublish: '$(UniversalPackageVersion)'
-          packagePublishDescription: 'SOTA Device Emulator ($(UniversalPackageDescription) channel)'
+          packagePublishDescription: $[format('SOTA Device Emulator ({0} channel)', ReleaseType)]

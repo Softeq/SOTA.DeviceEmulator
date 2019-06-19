@@ -7,15 +7,15 @@ class BuildMetadata
     public BuildMetadata(GitVersion gitVersion)
     {
         BuildVersion = gitVersion.FullSemVer;
-        var lowerCaseSemVer = gitVersion.FullSemVer.ToLowerInvariant();
-        var semverParts = lowerCaseSemVer.Split('-');
+        var universalSemver = new string(gitVersion.FullSemVer.ToLowerInvariant().TakeWhile(c => c != '+').ToArray());
+        var universalSemverParts = universalSemver.Split('-');
         var index = 1;
-        foreach (var part in semverParts.Skip(index))
+        foreach (var part in universalSemverParts.Skip(index))
         {
-            semverParts[index] = part.Replace(".", string.Empty);
+            universalSemverParts[index] = part.Replace(".", string.Empty);
             index++;
         }
-        UniversalPackageVersion = string.Join("-", semverParts);
+        UniversalPackageVersion = string.Join("-", universalSemverParts);
         ReleaseType = CultureInfo.InvariantCulture.TextInfo.ToTitleCase(gitVersion.PreReleaseLabel ?? "stable");
     }
 
