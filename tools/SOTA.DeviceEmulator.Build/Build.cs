@@ -29,7 +29,7 @@ class Build : NukeBuild
     readonly Configuration Configuration = IsLocalBuild ? Configuration.Debug : Configuration.Release;
 
     [Solution] readonly Solution Solution;
-    [PathExecutable] readonly Tool Terraform;
+    //[PathExecutable] readonly Tool Terraform;
     [PathExecutable("az")] readonly Tool AzCli;
     BuildMetadata Metadata;
 
@@ -121,16 +121,16 @@ class Build : NukeBuild
                             }
                         });
 
-    Target Deploy => _ =>
-        _.DependsOn(DirectoryExists(PackageDirectory) ? Array.Empty<Target>() : new[] {Package})
-         .Executes(() =>
-         {
-             var staticWebsite = ProvisionStaticWebsite();
-             AzCli(
-                 $"storage blob upload-batch --source {PackageDirectory} --destination $web --account-name {staticWebsite.BlobStorageAccountName} --destination-path {Metadata.ReleaseType}");
-             AzCli(
-                 $"storage blob upload-batch --source {DownloadWebsiteDirectory} --destination $web --account-name {staticWebsite.BlobStorageAccountName}");
-         });
+    //Target Deploy => _ =>
+    //    _.DependsOn(DirectoryExists(PackageDirectory) ? Array.Empty<Target>() : new[] {Package})
+    //     .Executes(() =>
+    //     {
+    //         var staticWebsite = ProvisionStaticWebsite();
+    //         AzCli(
+    //             $"storage blob upload-batch --source {PackageDirectory} --destination $web --account-name {staticWebsite.BlobStorageAccountName} --destination-path {Metadata.ReleaseType}");
+    //         AzCli(
+    //             $"storage blob upload-batch --source {DownloadWebsiteDirectory} --destination $web --account-name {staticWebsite.BlobStorageAccountName}");
+    //     });
 
     Target LocalBuild => _ => _
         .DependsOn(Test, Package);
@@ -155,55 +155,55 @@ class Build : NukeBuild
         Metadata = new BuildMetadata(gitVersion);
     }
 
-    IReadOnlyCollection<Output> ExecuteTerraform(string command, IReadOnlyDictionary<string, string> args = null)
-    {
-        var arguments = new List<string> {command};
-        foreach (var (k, v) in args ?? ImmutableDictionary<string, string>.Empty)
-        {
-            var parts = new List<string> {k};
-            if (!string.IsNullOrEmpty(v))
-            {
-                parts.Add("\"{v}\"");
-            }
+    //IReadOnlyCollection<Output> ExecuteTerraform(string command, IReadOnlyDictionary<string, string> args = null)
+    //{
+    //    var arguments = new List<string> {command};
+    //    foreach (var (k, v) in args ?? ImmutableDictionary<string, string>.Empty)
+    //    {
+    //        var parts = new List<string> {k};
+    //        if (!string.IsNullOrEmpty(v))
+    //        {
+    //            parts.Add("\"{v}\"");
+    //        }
 
-            arguments.Add($"-{string.Join('=', parts)}");
-        }
+    //        arguments.Add($"-{string.Join('=', parts)}");
+    //    }
 
-        var environmentVariables = Environment.GetEnvironmentVariables()
-                                              .Cast<DictionaryEntry>()
-                                              .ToDictionary(x => (string)x.Key, x => (string)x.Value);
-        var terraformEnvironmentVariables = new Dictionary<string, string>
-        {
-            ["TF_LOG_PATH"] = Solution.Directory / "terraform.log"
-        };
-        foreach (var (key, value) in terraformEnvironmentVariables)
-        {
-            environmentVariables[key] = value;
-        }
+    //    var environmentVariables = Environment.GetEnvironmentVariables()
+    //                                          .Cast<DictionaryEntry>()
+    //                                          .ToDictionary(x => (string)x.Key, x => (string)x.Value);
+    //    var terraformEnvironmentVariables = new Dictionary<string, string>
+    //    {
+    //        ["TF_LOG_PATH"] = Solution.Directory / "terraform.log"
+    //    };
+    //    foreach (var (key, value) in terraformEnvironmentVariables)
+    //    {
+    //        environmentVariables[key] = value;
+    //    }
 
-        return Terraform(string.Join(' ', arguments), TerraformProjectDirectory, environmentVariables);
-    }
+    //    return Terraform(string.Join(' ', arguments), TerraformProjectDirectory, environmentVariables);
+    //}
 
-    StaticWebsiteMetadata ProvisionStaticWebsite()
-    {
-        ExecuteTerraform("init");
-        var applyArgs = new Dictionary<string, string>();
-        if (!IsLocalBuild)
-        {
-            applyArgs["auto-approve"] = null;
-        }
+    //StaticWebsiteMetadata ProvisionStaticWebsite()
+    //{
+    //    ExecuteTerraform("init");
+    //    var applyArgs = new Dictionary<string, string>();
+    //    if (!IsLocalBuild)
+    //    {
+    //        applyArgs["auto-approve"] = null;
+    //    }
 
-        ExecuteTerraform("apply", applyArgs);
-        var outputArgs = new Dictionary<string, string> {["json"] = null};
-        var result = ExecuteTerraform("output", outputArgs);
-        var json = string.Join(string.Empty, result.Where(x => x.Type == OutputType.Std).Select(x => x.Text));
-        var output = JObject.Parse(json);
-        var terraformOutputs = new JObject();
-        foreach (var (key, value) in output)
-        {
-            terraformOutputs[key] = value.SelectToken("value").Value<string>();
-        }
+    //    ExecuteTerraform("apply", applyArgs);
+    //    var outputArgs = new Dictionary<string, string> {["json"] = null};
+    //    var result = ExecuteTerraform("output", outputArgs);
+    //    var json = string.Join(string.Empty, result.Where(x => x.Type == OutputType.Std).Select(x => x.Text));
+    //    var output = JObject.Parse(json);
+    //    var terraformOutputs = new JObject();
+    //    foreach (var (key, value) in output)
+    //    {
+    //        terraformOutputs[key] = value.SelectToken("value").Value<string>();
+    //    }
 
-        return terraformOutputs.ToObject<StaticWebsiteMetadata>();
-    }
+    //    return terraformOutputs.ToObject<StaticWebsiteMetadata>();
+    //}
 }
