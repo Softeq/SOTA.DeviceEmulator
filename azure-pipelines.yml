@@ -1,8 +1,14 @@
 variables:
   - name: verbosity
     value: Normal
-  - name: isPullRequest
-    value: $[eq(variables['Build.Reason'], 'PullRequest')]
+  - name: isReleaseOrHotfixBranch
+    value: $[or(startsWith(variables['Build.SourceBranch'], 'refs/heads/release'), startsWith(variables['Build.SourceBranch'], 'refs/heads/hotfix'))]
+  - name: isMasterOrDevelopBranch
+    value: $[or(eq(variables['Build.SourceBranch'], 'refs/heads/master'), eq(variables['Build.SourceBranch'], 'refs/heads/develop'))]
+  - name: isRelease2
+    value: $[or(variables['isMasterOrDevelopBranch'], and(variables['isReleaseOrHotfixBranch'], contains(variables['Build.SourceVersionMessage'], '[ci release]')))]
+  - name: isRelease
+    value: true
 trigger:
 - master
 - develop
@@ -17,6 +23,11 @@ stages:
       vmImage: 'windows-2019'
     steps:
     - task: PowerShell@2
+      displayName: Print all environment variables
+      inputs:
+      targetType: inline
+      script: gci env:* | sort-object name
+    - task: PowerShell@2
       displayName: Test and build application package
       inputs:
         filePath: "build.ps1"
@@ -29,23 +40,25 @@ stages:
         failTaskOnFailedTests: true
     - task: CopyFiles@2
       displayName: Copy artifacts
-      # condition: ne(variables['Build.Reason'], 'PullRequest')
+      condition: variables['isRelease']
       inputs:
         sourceFolder: artifacts
         contents: '**\*'
         targetFolder: $(Build.ArtifactStagingDirectory)
     - task: PublishBuildArtifacts@1
       displayName: Publish artifacts
-      # condition: ne(variables['Build.Reason'], 'PullRequest')
+      condition: variables['isRelease']
       inputs: 
         pathtoPublish: '$(Build.ArtifactStagingDirectory)'
         artifactName: ApplicationBinaries
 - stage: Release
+  condition: variables['isRelease']
   jobs:
     - job: ReleaseApplication
       displayName: Release application
       variables:
         isPreRelease: $[ne(variables['ReleaseType'], 'Stable')]
+        isAlpha: $[eq(variables['ReleaseType'], 'Alpha')]
       pool:
         vmImage: 'windows-2019'
       steps:
@@ -73,6 +86,7 @@ stages:
           packagePublishDescription: '$(UniversalPackageDescription)'
       - task: ArchiveFiles@2
         displayName: Package application binaries
+        condition: not(variables['isAlpha'])
         inputs:
           rootFolderOrFile: '$(System.ArtifactsDirectory)/ApplicationBinaries' 
           includeRootFolder: false
@@ -81,6 +95,7 @@ stages:
           replaceExistingArchive: true 
       - task: GitHubRelease@0
         displayName: Create GitHub release
+        condition: not(variables['isAlpha'])
         inputs:
           gitHubConnection: GitHubReleaseAccessToken
           repositoryName: '$(Build.Repository.Name)' 
