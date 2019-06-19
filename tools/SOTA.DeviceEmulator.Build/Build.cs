@@ -60,16 +60,10 @@ class Build : NukeBuild
                  .SetArgumentConfigurator(a => a.Add($"/updateassemblyinfo \"{assemblyVersionFilePath}\"")));
         });
 
-    Target CiSetVersion => _ => _
+    Target CiSetBuildMetadata => _ => _
         .Executes(() =>
         {
-            if (TeamServices.Instance != null)
-            {
-                TeamServices.Instance.UpdateBuildNumber(Metadata.BuildVersion);
-                Console.WriteLine($"##vso[task.setvariable variable=UniversalPackageVersion]{Metadata.UniversalPackageVersion}");
-                Console.WriteLine($"##vso[task.setvariable variable=UniversalPackageDescription]{Metadata.UniversalPackageVersion}");
-                Console.WriteLine($"##vso[task.setvariable variable=ReleaseType]{Metadata.ReleaseType}");
-            }
+            Metadata.SetToCi();
         });
 
     Target Package => _ => _
@@ -110,7 +104,7 @@ class Build : NukeBuild
         .DependsOn(Test, Package);
 
     Target CiBuild => _ => _
-        .DependsOn(CiSetVersion, Clean, Test, Package);
+        .DependsOn(CiSetBuildMetadata, Clean, Test, Package);
 
     /// Support plugins are available for:
     /// - JetBrains ReSharper        https://nuke.build/resharper
