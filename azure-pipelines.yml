@@ -44,7 +44,7 @@ stages:
     - job: ReleaseApplication
       displayName: Release application
       variables:
-        isPreRelease: $[ne(ReleaseType, "Stable")]
+        isPreRelease: $[ne(variables['ReleaseType'], "Stable")]
       pool:
         vmImage: 'windows-2019'
       steps:
@@ -59,17 +59,24 @@ stages:
           buildType: 'current'
           downloadType: 'single'
           artifactName: ApplicationBinaries
-          downloadPath: '$(System.ArtifactsDirectory)'
+          downloadPath: '$(System.ArtifactsDirectory)/Package'
       - task: UniversalPackages@0
         displayName: Publish universal package
         inputs:
           command: publish
-          publishDirectory: '$(System.ArtifactsDirectory)'
+          publishDirectory: '$(System.ArtifactsDirectory)/Package'
           vstsFeedPublish: SOTA
           vstsFeedPackagePublish: sota-deviceemulator
           versionOption: custom
           versionPublish: '$(UniversalPackageVersion)'
           packagePublishDescription: '$(UniversalPackageDescription)'
+      - task: ArchiveFiles@2
+        inputs:
+          rootFolderOrFile: '$(System.ArtifactsDirectory)/Package' 
+          includeRootFolder: false
+          archiveType: 'zip'
+          archiveFile: '$(Build.ArtifactStagingDirectory)/SOTA.DeviceEmulator_$(Build.BuildNumber).zip' 
+          replaceExistingArchive: true 
       - task: GitHubRelease@0
         displayName: Create GitHub release
         inputs:
@@ -80,6 +87,6 @@ stages:
           tagSource: 'manual'
           tag: '$(ReleaseGitTag)'
           title: '$(UniversalPackageDescription)'
-          assets: '$(System.ArtifactsDirectory)/**'
+          assets: '$(System.ArtifactsDirectory)/*.zip'
           isPreRelease: '$(isPreRelease)'
           addChangeLog: true
