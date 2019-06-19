@@ -46,7 +46,7 @@ stages:
         displayName: Set release version
         inputs:
           filePath: "build.ps1"
-          arguments: "SetVersion --Verbosity $(verbosity)"
+          arguments: "CiSetVersion --Verbosity $(verbosity)"
       - task: DownloadBuildArtifacts@0
         inputs:
           buildType: 'current'

@@ -56,14 +56,19 @@ class Build : NukeBuild
             NuGetRestore(o => o.SetSolutionDirectory(Solution.Directory));
         });
 
-    Target SetVersion => _ => _
+    Target SetAssemblyVersion => _ => _
         .Executes(() =>
         {
+            Info($"Build Version: {Metadata.BuildVersion}");
             var assemblyVersionFilePath = EntryProject.Directory / "Properties" / "AssemblyVersionInfo.cs";
             GitVersion(o =>
                 o.SetEnsureAssemblyInfo(true)
                  .SetArgumentConfigurator(a => a.Add($"/updateassemblyinfo \"{assemblyVersionFilePath}\"")));
-            Info($"Build Version: {Metadata.BuildVersion}");
+        });
+
+    Target CiSetVersion => _ => _
+        .Executes(() =>
+        {
             if (TeamServices.Instance != null)
             {
                 TeamServices.Instance.UpdateBuildNumber(Metadata.BuildVersion);
@@ -71,7 +76,7 @@ class Build : NukeBuild
         });
 
     Target Package => _ => _
-                           .DependsOn(Restore, SetVersion)
+                           .DependsOn(Restore, SetAssemblyVersion)
                            .Executes(() =>
                            {
                                var installUrl =
@@ -137,7 +142,7 @@ class Build : NukeBuild
         .DependsOn(Test, Package);
 
     Target CiBuild => _ => _
-        .DependsOn(Clean, Test, Package);
+        .DependsOn(CiSetVersion, Clean, Test, Package);
 
     /// Support plugins are available for:
     /// - JetBrains ReSharper        https://nuke.build/resharper
