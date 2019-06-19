@@ -1,4 +1,5 @@
-using Colorful;
+using System.IO;
+using Newtonsoft.Json;
 using Nuke.Common;
 using Nuke.Common.BuildServers;
 using Nuke.Common.Execution;
@@ -20,9 +21,6 @@ using static Nuke.Common.Tools.NuGet.NuGetTasks;
 [UnsetVisualStudioEnvironmentVariables]
 class Build : NukeBuild
 {
-    //[PathExecutable] readonly Tool Terraform;
-    [PathExecutable("az")] readonly Tool AzCli;
-
     [Parameter("Configuration to build - Default is 'Debug' (local) or 'Release' (server)")]
     readonly Configuration Configuration = IsLocalBuild ? Configuration.Debug : Configuration.Release;
 
@@ -32,8 +30,6 @@ class Build : NukeBuild
     Project EntryProject => Solution.GetProject("SOTA.DeviceEmulator");
     AbsolutePath ArtifactsDirectory => RootDirectory / "artifacts";
     AbsolutePath NuGetPackagesDirectory => RootDirectory / "packages";
-    AbsolutePath TerraformProjectDirectory => RootDirectory / "tools" / "SOTA.DeviceEmulator.Infrastructure";
-    AbsolutePath DownloadWebsiteDirectory => TerraformProjectDirectory / "website";
 
     Target Clean => _ => _
                          .Before(Restore)
@@ -75,6 +71,9 @@ class Build : NukeBuild
                                     .SetConfiguration(Configuration)
                                     .SetTargets("Build")
                                     .AddProperty("OutDir", ArtifactsDirectory));
+                               var metadataJson = JsonConvert.SerializeObject(Metadata);
+                               var metadataFilePath = ArtifactsDirectory / "app-package.json";
+                               File.WriteAllText(metadataFilePath, metadataJson);
                            });
 
     Target Test => _ => _
