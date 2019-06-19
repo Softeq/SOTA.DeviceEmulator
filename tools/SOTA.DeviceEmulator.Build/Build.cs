@@ -14,6 +14,7 @@ using Nuke.Common.Tools.DotNet;
 using Nuke.Common.Tools.GitVersion;
 using Nuke.Common.Tools.MSBuild;
 using Nuke.Common.Tools.NuGet;
+using static Nuke.Common.Logger;
 using static Nuke.Common.IO.FileSystemTasks;
 using static Nuke.Common.IO.PathConstruction;
 using static Nuke.Common.Tools.DotNet.DotNetTasks;
@@ -62,6 +63,7 @@ class Build : NukeBuild
             GitVersion(o =>
                 o.SetEnsureAssemblyInfo(true)
                  .SetArgumentConfigurator(a => a.Add($"/updateassemblyinfo \"{assemblyVersionFilePath}\"")));
+            Info($"Build Version: {Metadata.BuildVersion}");
             if (TeamServices.Instance != null)
             {
                 TeamServices.Instance.UpdateBuildNumber(Metadata.BuildVersion);
