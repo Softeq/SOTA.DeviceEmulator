@@ -31,7 +31,8 @@ stages:
       displayName: Copy artifacts
       # condition: ne(variables['Build.Reason'], 'PullRequest')
       inputs:
-        contents: 'artifacts/**'
+        sourceFolder: artifacts
+        contents: '**\*'
         targetFolder: $(Build.ArtifactStagingDirectory)
     - task: PublishBuildArtifacts@1
       displayName: Publish artifacts
@@ -59,20 +60,21 @@ stages:
           buildType: 'current'
           downloadType: 'single'
           artifactName: ApplicationBinaries
-          downloadPath: '$(System.ArtifactsDirectory)/Package'
+          downloadPath: '$(System.ArtifactsDirectory)'
       - task: UniversalPackages@0
         displayName: Publish universal package
         inputs:
           command: publish
-          publishDirectory: '$(System.ArtifactsDirectory)/Package'
+          publishDirectory: '$(System.ArtifactsDirectory)/ApplicationBinaries'
           vstsFeedPublish: SOTA
           vstsFeedPackagePublish: sota-deviceemulator
           versionOption: custom
           versionPublish: '$(UniversalPackageVersion)'
           packagePublishDescription: '$(UniversalPackageDescription)'
       - task: ArchiveFiles@2
+        displayName: Package application binaries
         inputs:
-          rootFolderOrFile: '$(System.ArtifactsDirectory)/Package' 
+          rootFolderOrFile: '$(System.ArtifactsDirectory)/ApplicationBinaries' 
           includeRootFolder: false
           archiveType: 'zip'
           archiveFile: '$(Build.ArtifactStagingDirectory)/SOTA.DeviceEmulator_$(Build.BuildNumber).zip' 
