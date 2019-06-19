@@ -65,4 +65,4 @@ stages:
           vstsFeedPackagePublish: sota-deviceemulator
           versionOption: custom
           versionPublish: '$(UniversalPackageVersion)'
-          packagePublishDescription: $[format('SOTA Device Emulator ({0} channel)', ReleaseType)]
+          packagePublishDescription: '$(UniversalPackageDescription)'

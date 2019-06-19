@@ -21,5 +21,6 @@ class BuildMetadata
 
     public string BuildVersion { get; }
     public string UniversalPackageVersion { get; }
+    public string UniversalPackageDescription => $"SOTA Device Emulator ({ReleaseType} channel)";
     public string ReleaseType { get; }
 }

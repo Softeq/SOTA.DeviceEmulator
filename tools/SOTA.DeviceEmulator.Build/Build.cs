@@ -67,6 +67,7 @@ class Build : NukeBuild
             {
                 TeamServices.Instance.UpdateBuildNumber(Metadata.BuildVersion);
                 Console.WriteLine($"##vso[task.setvariable variable=UniversalPackageVersion]{Metadata.UniversalPackageVersion}");
+                Console.WriteLine($"##vso[task.setvariable variable=UniversalPackageDescription]{Metadata.UniversalPackageVersion}");
                 Console.WriteLine($"##vso[task.setvariable variable=ReleaseType]{Metadata.ReleaseType}");
             }
         });
