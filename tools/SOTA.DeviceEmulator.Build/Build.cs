@@ -74,6 +74,10 @@ class Build : NukeBuild
                                var metadataJson = JsonConvert.SerializeObject(Metadata);
                                var metadataFilePath = ArtifactsDirectory / "app-package.json";
                                File.WriteAllText(metadataFilePath, metadataJson);
+                               var metadataScriptFilePath =
+                                   // ReSharper disable once PossibleNullReferenceException
+                                   Solution.GetProject("SOTA.DeviceEmulator.Build").Directory / "set-metadata.ps1";
+                               CopyFileToDirectory(metadataScriptFilePath, ArtifactsDirectory);
                            });
 
     Target Test => _ => _

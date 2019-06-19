@@ -1,5 +1,4 @@
 using System.Globalization;
-using System.Linq;
 using Colorful;
 using Nuke.Common.BuildServers;
 using Nuke.Common.Tools.GitVersion;
@@ -22,17 +21,18 @@ class BuildMetadata
 
     public void SetToCi()
     {
-        if (TeamServices.Instance != null)
+        if (TeamServices.Instance == null)
         {
-            TeamServices.Instance.UpdateBuildNumber(BuildVersion);
-            Set(nameof(UniversalPackageVersion), UniversalPackageVersion);
-            Set(nameof(UniversalPackageDescription), UniversalPackageDescription);
-            Set(nameof(ReleaseType), ReleaseType);
-            Set(nameof(ReleaseGitTag), ReleaseGitTag);
+            return;
         }
+        TeamServices.Instance.UpdateBuildNumber(BuildVersion);
+        Set(nameof(UniversalPackageVersion), UniversalPackageVersion);
+        Set(nameof(UniversalPackageDescription), UniversalPackageDescription);
+        Set(nameof(ReleaseType), ReleaseType);
+        Set(nameof(ReleaseGitTag), ReleaseGitTag);
     }
 
-    void Set(string name, string value)
+    static void Set(string name, string value)
     {
         Console.WriteLine($"##vso[task.setvariable variable={name}]{value}");
     }
