@@ -8,9 +8,9 @@ trigger:
 - hotfix/*
 stages:
 - stage: Build
-  displayName: Build application package
   jobs:
   - job: BuildApplication
+    displayName: Build application
     pool:
       vmImage: 'windows-2019'
     steps:
@@ -29,7 +29,7 @@ stages:
       displayName: Copy artifacts
       # condition: ne(variables['Build.Reason'], 'PullRequest')
       inputs:
-        contents: 'artifacts/SOTA.DeviceEmulator/**'
+        contents: 'artifacts/**'
         targetFolder: $(Build.ArtifactStagingDirectory)
     - task: PublishBuildArtifacts@1
       displayName: Publish artifacts
@@ -37,10 +37,10 @@ stages:
       inputs: 
         pathtoPublish: '$(Build.ArtifactStagingDirectory)'
         artifactName: ClickOncePackage
-- stage: Publish
-  displayName: Publish application package
+- stage: Release
   jobs:
-    - job: PublishArtifacts
+    - job: ReleaseApplication
+      displayName: Release application
       pool:
         vmImage: 'windows-2019'
       steps:
@@ -50,18 +50,19 @@ stages:
           filePath: "build.ps1"
           arguments: "CiSetVersion --Verbosity $(verbosity)"
       - task: DownloadBuildArtifacts@0
+        displayName: Download build artifacts
         inputs:
           buildType: 'current'
           downloadType: 'single'
           artifactName: ClickOncePackage
           downloadPath: '$(System.ArtifactsDirectory)'
       - task: UniversalPackages@0
+        displayName: Publish universal package
         inputs:
           command: publish
           publishDirectory: '$(System.ArtifactsDirectory)'
           vstsFeedPublish: SOTA
           vstsFeedPackagePublish: sota-deviceemulator
           versionOption: custom
-          versionPublish: '$(Build.BuildNumber)'
-
-
+          versionPublish: '$(UniversalPackageVersion)'
+          packagePublishDescription: 'SOTA Device Emulator ($(UniversalPackageDescription) channel)'
