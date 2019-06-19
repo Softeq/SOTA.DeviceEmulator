@@ -68,7 +68,7 @@ stages:
           packagePublishDescription: '$(UniversalPackageDescription)'
       - task: GitHubRelease@0
         inputs:
-          gitHubConnection: Softeq
+          gitHubConnection: GitHubReleaseAccessToken
           repositoryName: '$(Build.Repository.Name)' 
           action: 'create'
           target: '$(Build.SourceVersion)'
