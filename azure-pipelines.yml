@@ -2,7 +2,7 @@ variables:
   - name: verbosity
     value: Normal
   - name: isPublishEnabled
-    value: ${{not(eq(variables['Build.Reason'], 'PullRequest'))}}
+    value: $[not(eq(variables['Build.Reason'], 'PullRequest')]
 trigger:
 - master
 - develop
