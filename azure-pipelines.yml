@@ -1,6 +1,8 @@
 variables:
   - name: verbosity
     value: Normal
+  - name: isPullRequest
+    value: $[eq(variables['Build.Reason'], 'PullRequest')]
 trigger:
 - master
 - develop
@@ -41,6 +43,8 @@ stages:
   jobs:
     - job: ReleaseApplication
       displayName: Release application
+      variables:
+        isPreRelease: $[ne(ReleaseType, "Stable")]
       pool:
         vmImage: 'windows-2019'
       steps:
@@ -67,6 +71,7 @@ stages:
           versionPublish: '$(UniversalPackageVersion)'
           packagePublishDescription: '$(UniversalPackageDescription)'
       - task: GitHubRelease@0
+        displayName: Create GitHub release
         inputs:
           gitHubConnection: GitHubReleaseAccessToken
           repositoryName: '$(Build.Repository.Name)' 
@@ -76,5 +81,5 @@ stages:
           tag: '$(ReleaseGitTag)'
           title: '$(UniversalPackageDescription)'
           assets: '$(System.ArtifactsDirectory)/**'
-          isPreRelease: '$[ne(ReleaseType, "Stable")]'
+          isPreRelease: '$(isPreRelease)'
           addChangeLog: true
