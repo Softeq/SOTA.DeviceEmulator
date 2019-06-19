@@ -8,33 +8,53 @@ trigger:
 - hotfix/*
 stages:
 - stage: Build
-  displayName: Build application ClickOnce package
+  displayName: Build application package
   jobs:
-    - job: BuildApplication
-      displayName: Build application
-      pool:
-        vmImage: 'windows-2019'
+  - job: BuildApplication
+    pool:
+      vmImage: 'windows-2019'
+    steps:
+    - task: PowerShell@2
+      displayName: Test and build application package
+      inputs:
+        filePath: "build.ps1"
+        arguments: "CiBuild --Verbosity $(verbosity)"
+    - task: PublishTestResults@2
+      displayName: Publish test results
+      inputs:
+        testRunner: VSTest
+        testResultsFiles: 'TestResults/**/*.trx'
+        failTaskOnFailedTests: true
+    - task: CopyFiles@2
+      displayName: Copy artifacts
+      # condition: ne(variables['Build.Reason'], 'PullRequest')
+      inputs:
+        contents: 'artifacts/SOTA.DeviceEmulator/**'
+        targetFolder: $(Build.ArtifactStagingDirectory)
+    - task: PublishBuildArtifacts@1
+      displayName: Publish artifacts
+      # condition: ne(variables['Build.Reason'], 'PullRequest')
+      inputs: 
+        pathtoPublish: '$(Build.ArtifactStagingDirectory)'
+        artifactName: ClickOncePackage
+- stage: Publish
+  displayName: Publish application package
+  jobs:
+    - job: PublishArtifacts
       steps:
-      - task: PowerShell@2
-        displayName: Test and build application package
+      - task: DownloadBuildArtifacts@0
         inputs:
-          filePath: "build.ps1"
-          arguments: "CiBuild --Verbosity $(verbosity)"
-      - task: PublishTestResults@2
-        displayName: Publish test results
-        inputs:
-          testRunner: VSTest
-          testResultsFiles: 'TestResults/**/*.trx'
-          failTaskOnFailedTests: true
-      - task: CopyFiles@2
-        displayName: Copy artifacts
-        condition: ne(variables['Build.Reason'], 'PullRequest')
-        inputs:
-          contents: 'artifacts/SOTA.DeviceEmulator/**'
-          targetFolder: $(Build.ArtifactStagingDirectory)
-      - task: PublishBuildArtifacts@1
-        displayName: Publish artifacts
-        condition: ne(variables['Build.Reason'], 'PullRequest')
-        inputs: 
-          pathtoPublish: '$(Build.ArtifactStagingDirectory)'
+          buildType: 'current'
+          downloadType: 'single'
           artifactName: ClickOncePackage
+          downloadPath: '$(System.ArtifactsDirectory)'
+      - task: UniversalPackages@0
+        inputs:
+          command: publish
+          publishDirectory: '$(System.ArtifactsDirectory)'
+          vstsFeedPublish: SOTA
+          vstsFeedPackagePublish: SOTA.DeviceEmulator
+          versionOption: custom
+          versionPublish: '$(Build.BuildNumber)'
+
+
