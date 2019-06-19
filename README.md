@@ -27,35 +27,20 @@ After installing all required dependencies, make sure you can build the project 
 ./build LocalBuild
 ```
 
-## Deployment
+## Releases
 
-The application is built as a ClickOnce package and published to an Azure Blob storage.
+The application binaries are published to an internal [Azure Artifacts feed](https://dev.azure.com/SofteqDevelopment/SOTA/_packaging?_a=feed&feed=SOTA). Beta and stable releases are also published to GitHub.
 
-Make sure the necessary resources are created in an Azure subscription:
+To make a release, the following conditions should be satisfied:
 
-* Resource group named `sota`
-* Blob storage account named `sotaops`
-* Blob storage container named `terraform-state`
+* The branch should be either **develop**, **master**, **release** (e.g `release/1.1.0`) or **hotfix** (e.g. `hotfix/1.1.1`).
+* For **release** and **hotfix** branches the commit message should contain **`[ci release]`** in the commit message. You can add that to a merge comment when merging a PR or by pushing an empty commit containing the mentioned message.
 
-You can use the following command samples to create all listed things:
+From the developer perspective the release flow can be described as follows:
 
-```powershell
-# Login and select subscription
-az login
-az account set --subscription <your-subscription-id>
-
-# Create resource group
-az group create --name sota --location eastus
-
-# Create blob storage account
-az storage account create --name sotaops --resource-group sota --location eastus --sku Standard_LRS
-
-# Create blob storage container
-az storage container create --name terraform-state --account-name sotaops
-```
-
-Then, use deploy script to upload artifacts to the blob storage
-
-```powershell
-./build Deploy
-```
+1. Develop and merge several feature or bugfix pull requests targeting develop branch (`feature/XXXX_[feature-name] → develop`).
+2. On code freeze day create a release branch and open a release PR (`release/x.x.x → master`).
+3. Fix known critical and major bugs using bugfix PRs targeting release branch (`bugfix/XXXX_[bug-name] → release/x.x.x`). 
+4. Make a beta release when merging last bugfix PR by including **`[ci release]`** in the merge commit message.
+5. Wait until regression and user acceptance testing is finished.
+6. Make a stable release by merging release PR into `master`.
