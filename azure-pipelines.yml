@@ -44,7 +44,7 @@ stages:
     - job: ReleaseApplication
       displayName: Release application
       variables:
-        isPreRelease: $[ne(variables['ReleaseType'], "Stable")]
+        isPreRelease: $[ne(variables['ReleaseType'], 'Stable')]
       pool:
         vmImage: 'windows-2019'
       steps:
