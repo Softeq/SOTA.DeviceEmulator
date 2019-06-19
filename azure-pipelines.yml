@@ -29,14 +29,14 @@ stages:
         failTaskOnFailedTests: true
     - task: CopyFiles@2
       displayName: Copy artifacts
-      # condition: variables['isPublishEnabled']
+      condition: variables['isPublishEnabled']
       inputs:
         sourceFolder: 'artifacts'
         contents: '**/*'
         targetFolder: $(Build.ArtifactStagingDirectory)
     - task: PublishBuildArtifacts@1
       displayName: Publish artifacts
-      # condition: variables['isPublishEnabled']
+      condition: variables['isPublishEnabled']
       inputs: 
         pathtoPublish: '$(Build.ArtifactStagingDirectory)'
         artifactName: ApplicationBinaries
