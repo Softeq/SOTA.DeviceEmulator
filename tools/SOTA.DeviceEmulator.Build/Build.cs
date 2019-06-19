@@ -59,13 +59,12 @@ class Build : NukeBuild
         .Executes(() =>
         {
             var assemblyVersionFilePath = EntryProject.Directory / "Properties" / "AssemblyVersionInfo.cs";
-            var gitVersion = GitVersion(o =>
-                    o.SetEnsureAssemblyInfo(true)
-                     .SetArgumentConfigurator(a => a.Add($"/updateassemblyinfo \"{assemblyVersionFilePath}\"")))
-                .Result;
+            GitVersion(o =>
+                o.SetEnsureAssemblyInfo(true)
+                 .SetArgumentConfigurator(a => a.Add($"/updateassemblyinfo \"{assemblyVersionFilePath}\"")));
             if (TeamServices.Instance != null)
             {
-                TeamServices.Instance.UpdateBuildNumber(gitVersion.FullSemVer);
+                TeamServices.Instance.UpdateBuildNumber(Metadata.BuildVersion);
             }
         });
 
