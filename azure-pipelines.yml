@@ -41,6 +41,8 @@ stages:
   displayName: Publish application package
   jobs:
     - job: PublishArtifacts
+      pool:
+        vmImage: 'windows-2019'
       steps:
       - task: PowerShell@2
         displayName: Set release version
@@ -58,7 +60,7 @@ stages:
           command: publish
           publishDirectory: '$(System.ArtifactsDirectory)'
           vstsFeedPublish: SOTA
-          vstsFeedPackagePublish: SOTA.DeviceEmulator
+          vstsFeedPackagePublish: sota-deviceemulator
           versionOption: custom
           versionPublish: '$(Build.BuildNumber)'
 
