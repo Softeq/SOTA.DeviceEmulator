@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using FluentAssertions;
@@ -12,27 +12,38 @@ namespace SOTA.DeviceEmulator.Core.Tests.Sensors
 {
     public class LocationSensorTest
     {
-        private static DateTime _measuringTime;
-        private static IPoint _procedureResult;
-        private static LocationSensor _locationSensor;
+        private static IPoint _functionResult;
 
         public static IEnumerable<object[]> GenerateData()
         {
-            _measuringTime = new DateTime(2019, 10, 10);
-            var procedure = new Mock<ITimeFunction<IPoint>>(MockBehavior.Strict);
-
-            _procedureResult = EarthGeometry.GeometryFactory.CreatePoint(new Coordinate(0, 0));
-            procedure.Setup(i => i.GetValue(_measuringTime)).Returns(_procedureResult);
-            _locationSensor = new LocationSensor(procedure.Object);
-
-            var noiseFactors = new[] {1, 2, 3, 4, 5, 10};
-            var testData = noiseFactors.Select(factor =>
+            var measureStartTime = new DateTime(2019, 10, 10);
+            var measureTimeValues = new List<DateTime>
             {
-                _locationSensor.NoiseFactor = factor;
+                measureStartTime + TimeSpan.FromMinutes(10),
+                measureStartTime + TimeSpan.FromMinutes(20),
+                measureStartTime + TimeSpan.FromMinutes(30),
+                measureStartTime + TimeSpan.FromMinutes(40),
+                measureStartTime + TimeSpan.FromMinutes(50),
+            };
+            var function = new Mock<ILocationFunction>(MockBehavior.Strict);
+            var locationSensor = new LocationSensor
+            {
+                Function = function.Object
+            };
+
+            function.Setup(i => i.Speed);
+
+            _functionResult = EarthGeometry.GeometryFactory.CreatePoint(new Coordinate(0, 0));
+
+            measureTimeValues.ForEach(
+                time =>
+                function.Setup(i => i.GetValue(time)).Returns(_functionResult));
+
+            var testData = measureTimeValues.Select(time =>
+            {
                 return new object[]
                 {
-                    factor,
-                    Enumerable.Range(0, 20).Select(i => _locationSensor.GetValue(_measuringTime)).ToList()
+                    Enumerable.Range(0, 20).Select(i => locationSensor.GetValue(time)).ToList()
                 };
             });
 
@@ -41,16 +52,12 @@ namespace SOTA.DeviceEmulator.Core.Tests.Sensors
 
         [Theory]
         [MemberData(nameof(GenerateData))]
-        public void Returns_ValidRandomValue_When_RangePassed(int noiseFactor, IEnumerable<IPoint> points)
+        public void Returns_ValidRandomValue_When_RangePassed(IEnumerable<IPoint> points)
         {
             foreach (var point in points)
             {
-                point.X.Should().BeInRange(
-                    _procedureResult.X - noiseFactor * LocationSensor.NoiseStep,
-                    _procedureResult.X + noiseFactor * LocationSensor.NoiseStep);
-                point.Y.Should().BeInRange(
-                    _procedureResult.Y - noiseFactor * LocationSensor.NoiseStep,
-                    _procedureResult.Y + noiseFactor * LocationSensor.NoiseStep);
+                point.X.Should().Be(_functionResult.X);
+                point.Y.Should().Be(_functionResult.Y);
             }
         }
     }

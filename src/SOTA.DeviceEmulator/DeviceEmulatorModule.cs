@@ -1,4 +1,4 @@
-﻿using System.Collections.ObjectModel;
+using System.Collections.ObjectModel;
 using Autofac;
 using Caliburn.Micro;
 using EnsureThat;
@@ -6,6 +6,7 @@ using MediatR;
 using Microsoft.Extensions.Hosting;
 using Serilog;
 using SOTA.DeviceEmulator.Core;
+using SOTA.DeviceEmulator.Core.Sensors;
 using SOTA.DeviceEmulator.Services.Infrastructure.Jobs;
 using SOTA.DeviceEmulator.Services.Infrastructure.Logging;
 using SOTA.DeviceEmulator.ViewModels;
@@ -71,6 +72,16 @@ namespace SOTA.DeviceEmulator
             builder
                 .RegisterAssemblyTypes(ThisAssembly)
                 .AsClosedTypesOf(typeof(INotificationHandler<>))
+                .SingleInstance();
+
+            builder
+                .RegisterAssemblyTypes(typeof(ISensor).Assembly)
+                .AssignableTo<ISensor>()
+                .As<ISensor>()
+                .InstancePerDependency();
+            builder
+                .RegisterType<Device>()
+                .As<IDevice>()
                 .SingleInstance();
         }
     }

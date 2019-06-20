@@ -1,39 +1,60 @@
-﻿using System;
-using EnsureThat;
+using System;
 using GeoAPI.Geometries;
 using SOTA.DeviceEmulator.Core.Sensors.TimeFunctions;
 
 namespace SOTA.DeviceEmulator.Core.Sensors
 {
-    public class LocationSensor
+    public class LocationSensor : ISensor
     {
-        // Noise step in kilometers.
-        public const double NoiseStep = 0.1;
-
-        private readonly ITimeFunction<IPoint> _function;
         private readonly Random _random;
+        private ILocationFunction _function = new LocationHarmonicFunction();
 
-        public LocationSensor(ITimeFunction<IPoint> function)
+        public LocationSensor()
         {
-            _function = Ensure.Any.IsNotNull(function, nameof(function));
             _random = new Random();
         }
 
-        public int NoiseFactor { get; set; } = 1;
+        public ILocationFunction Function
+        {
+            get => _function;
+            set
+            {
+                if (value != null)
+                {
+                    _function = value;
+                }
+            }
+        }
+
+        // Speed mean and deviation in km/h.
+        public double SpeedMean { get; set; } = 5;
+        public double SpeedDeviation { get; set; } = 0;
 
         public IPoint GetValue(DateTime currentTime)
         {
-            var deterministicPart = _function.GetValue(currentTime);
+            var functionResult = _function.GetValue(currentTime);
 
-            var noiseDistanceLat = _random.Next(NoiseFactor * -1, NoiseFactor) * NoiseStep;
-            var noiseDistanceLon = _random.Next(NoiseFactor * -1, NoiseFactor) * NoiseStep;
+            var point = EarthGeometry.GeometryFactory.CreatePoint(new Coordinate(functionResult.Coordinate.X, functionResult.Coordinate.Y));
 
-            var pointWithNoise = EarthGeometry.GeometryFactory.CreatePoint(
-                new Coordinate(
-                    deterministicPart.Coordinate.X + EarthGeometry.ConvertDistanceToAngleSize(noiseDistanceLon),
-                    deterministicPart.Coordinate.Y + EarthGeometry.ConvertDistanceToAngleSize(noiseDistanceLat)));
+            return point;
+        }
 
-            return pointWithNoise;
+        public void Report(DeviceTelemetry telemetry, DateTime time)
+        {
+            _function.Speed = CalculateSpeed(SpeedMean, SpeedDeviation);
+            var point = GetValue(time);
+
+            telemetry.Latitude = point.Y;
+            telemetry.Longitude = point.X;
+        }
+
+        private double CalculateSpeed(double mean, double deviation)
+        {
+            // Operations with 10 are required to get random double value with single precision sign.
+            var speedDeviation = _random.Next((int)Math.Floor(-10 * deviation), (int)Math.Floor(10 * deviation)) / 10;
+            var speed = mean + speedDeviation;
+
+            return speed;
         }
     }
 }

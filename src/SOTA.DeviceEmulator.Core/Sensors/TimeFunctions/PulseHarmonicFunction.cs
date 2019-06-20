@@ -1,11 +1,10 @@
-﻿using System;
+using System;
 
 namespace SOTA.DeviceEmulator.Core.Sensors.TimeFunctions
 {
     public class PulseHarmonicFunction : ITimeFunction<double>
     {
-        public static TimeSpan Period => TimeSpan.FromSeconds(5);
-
+        public static TimeSpan Period => TimeSpan.FromSeconds(20);
         protected double MiddleValue => 70;
         protected double Amplitude => 10;
 

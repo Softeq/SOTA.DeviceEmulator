@@ -1,14 +1,15 @@
-﻿using MediatR;
+using MediatR;
+using SOTA.DeviceEmulator.Core;
 
 namespace SOTA.DeviceEmulator.Services.Telemetry
 {
     public class TelemetryCollected : INotification
     {
-        public TelemetryCollected(int value)
+        public TelemetryCollected(DeviceTelemetry value)
         {
             Value = value;
         }
 
-        public int Value { get; }
+        public DeviceTelemetry Value { get; }
     }
 }
