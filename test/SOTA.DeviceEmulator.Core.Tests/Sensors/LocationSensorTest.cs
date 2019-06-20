@@ -25,19 +25,22 @@ namespace SOTA.DeviceEmulator.Core.Tests.Sensors
                 measureStartTime + TimeSpan.FromMinutes(40),
                 measureStartTime + TimeSpan.FromMinutes(50),
             };
-            var function = new Mock<ILocationFunction>(MockBehavior.Strict);
-            var locationSensor = new LocationSensor
+            var functionMock = new Mock<ILocationFunction>(MockBehavior.Strict);
+            var locationSensorPropertiesMock = new Mock<ILocationSensorOptions>(MockBehavior.Strict);
+            var locationSensor = new LocationSensor(locationSensorPropertiesMock.Object)
             {
-                Function = function.Object
+                Function = functionMock.Object
             };
 
-            function.Setup(i => i.Speed);
+            functionMock.Setup(i => i.Speed).Returns(0);
+            locationSensorPropertiesMock.Setup(i => i.SpeedMean).Returns(5);
+            locationSensorPropertiesMock.Setup(i => i.SpeedDeviation).Returns(1);
 
             _functionResult = EarthGeometry.GeometryFactory.CreatePoint(new Coordinate(0, 0));
 
             measureTimeValues.ForEach(
                 time =>
-                function.Setup(i => i.GetValue(time)).Returns(_functionResult));
+                functionMock.Setup(i => i.GetValue(time)).Returns(_functionResult));
 
             var testData = measureTimeValues.Select(time =>
             {

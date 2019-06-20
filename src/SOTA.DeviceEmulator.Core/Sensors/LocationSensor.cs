@@ -1,4 +1,5 @@
 using System;
+using EnsureThat;
 using GeoAPI.Geometries;
 using SOTA.DeviceEmulator.Core.Sensors.TimeFunctions;
 
@@ -7,11 +8,13 @@ namespace SOTA.DeviceEmulator.Core.Sensors
     public class LocationSensor : ISensor
     {
         private readonly Random _random;
+        private readonly ILocationSensorOptions _sensorOptions;
         private ILocationFunction _function = new LocationHarmonicFunction();
 
-        public LocationSensor()
+        public LocationSensor(ILocationSensorOptions locationSensorOptions)
         {
             _random = new Random();
+            _sensorOptions = Ensure.Any.IsNotNull(locationSensorOptions, nameof(locationSensorOptions));
         }
 
         public ILocationFunction Function
@@ -26,10 +29,6 @@ namespace SOTA.DeviceEmulator.Core.Sensors
             }
         }
 
-        // Speed mean and deviation in km/h.
-        public double SpeedMean { get; set; } = 5;
-        public double SpeedDeviation { get; set; } = 0;
-
         public IPoint GetValue(DateTime currentTime)
         {
             var functionResult = _function.GetValue(currentTime);
@@ -41,7 +40,7 @@ namespace SOTA.DeviceEmulator.Core.Sensors
 
         public void Report(DeviceTelemetry telemetry, DateTime time)
         {
-            _function.Speed = CalculateSpeed(SpeedMean, SpeedDeviation);
+            _function.Speed = CalculateSpeed(_sensorOptions.SpeedMean, _sensorOptions.SpeedDeviation);
             var point = GetValue(time);
 
             telemetry.Latitude = point.Y;

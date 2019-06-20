@@ -3,7 +3,6 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:sys="clr-namespace:System;assembly=mscorlib"
              xmlns:local="clr-namespace:SOTA.DeviceEmulator.Views"
              xmlns:viewModels="clr-namespace:SOTA.DeviceEmulator.ViewModels"
              xmlns:toolkit="http://schemas.xceed.com/wpf/xaml/toolkit"
@@ -13,15 +12,6 @@
              d:DesignWidth="800" 
              d:DataContext="{d:DesignInstance viewModels:SensorsViewModel}">
     <UserControl.Resources>
-        <ObjectDataProvider
-            MethodName="GetValues"
-            ObjectType="{x:Type sys:Enum}"
-            x:Key="FunctionTypeDataProvider">
-            <ObjectDataProvider.MethodParameters>
-                <x:Type TypeName="viewModels:FunctionType"/>
-            </ObjectDataProvider.MethodParameters>
-        </ObjectDataProvider>
-        <converters:EnumToDescriptionConverter x:Key="EnumToDescriptionConverter"/>
         <converters:LatLongToStringConverter x:Key="LatLongToStringConverter"/>
     </UserControl.Resources>
     <StackPanel>
@@ -83,8 +73,8 @@
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
-                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Speed (m/s, mean)"/>
-                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Speed (m/s, std)"/>
+                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Speed (km/h, mean)"/>
+                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Speed (km/h, std)"/>
                     <toolkit:DoubleUpDown
                         Grid.Row="0"
                         Grid.Column="2"
@@ -138,14 +128,10 @@
                     <TextBlock Grid.Row="0" Grid.Column="0" Text="Generator Algorithm" VerticalAlignment="Center"/>
                     <TextBlock Grid.Row="2" Grid.Column="0" Text="Noise Factor"/>
                     <StackPanel Grid.Row="0" Grid.Column="2" Orientation="Vertical">
-                        <ComboBox ItemsSource="{Binding Source={StaticResource FunctionTypeDataProvider}}"
-                                  SelectedItem="{Binding PulseAlgorithm}">
-                            <ComboBox.ItemTemplate>
-                                <DataTemplate>
-                                    <TextBlock Text="{Binding Converter={StaticResource EnumToDescriptionConverter}}"></TextBlock>
-                                </DataTemplate>
-                            </ComboBox.ItemTemplate>
-                        </ComboBox>
+                        <ComboBox ItemsSource="{Binding FunctionDictionary}"
+                                  SelectedValue="{Binding PulseFunction}"
+                                  DisplayMemberPath="Key"
+                                  SelectedValuePath="Value"/>
                     </StackPanel>
                     <toolkit:IntegerUpDown
                         Grid.Row="2"

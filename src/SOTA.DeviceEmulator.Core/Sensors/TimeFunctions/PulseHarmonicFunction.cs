@@ -1,7 +1,9 @@
 using System;
+using System.ComponentModel;
 
 namespace SOTA.DeviceEmulator.Core.Sensors.TimeFunctions
 {
+    [Description("Harmonic")]
     public class PulseHarmonicFunction : ITimeFunction<double>
     {
         public static TimeSpan Period => TimeSpan.FromSeconds(20);

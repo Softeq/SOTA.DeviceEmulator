@@ -1,34 +1,34 @@
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
 using Caliburn.Micro;
 using EnsureThat;
 using Serilog;
 using SOTA.DeviceEmulator.Core;
+using SOTA.DeviceEmulator.Core.Sensors;
 using SOTA.DeviceEmulator.Core.Sensors.TimeFunctions;
 using SOTA.DeviceEmulator.Services.Telemetry;
 
 namespace SOTA.DeviceEmulator.ViewModels
 {
-    public sealed class SensorsViewModel : Screen, ITabViewModel, IHandle<TelemetryCollected>
+    public sealed class SensorsViewModel : Screen, ITabViewModel, IHandle<TelemetryCollected>, ILocationSensorOptions, IPulseSensorOptions
     {
         private DeviceTelemetry _telemetry;
-        private double _speedMean = 2.5;
-        private double _speedDeviation = 1.5;
-        private FunctionType _pulseAlgorithm = FunctionType.Harmonic;
+        private double _speedMean = 5;
+        private double _speedDeviation = 1;
+        private ITimeFunction<double> _pulseFunction;
         private int _pulseNoiseFactor = 3;
 
-        private readonly IDevice _device;
-
-        public SensorsViewModel(ILogger logger, IEventAggregator eventAggregator, IDevice device)
+        public SensorsViewModel(ILogger logger, IEventAggregator eventAggregator, IEnumerable<ITimeFunction<double>> doubleTimeFunctions)
         {
             Ensure.Any.IsNotNull(eventAggregator, nameof(eventAggregator));
-            _device = Ensure.Any.IsNotNull(device, nameof(device));
 
-            ConfigureDeviceSensors();
+            InitializeFunctionDictionary(doubleTimeFunctions);
+            PulseFunction = FunctionDictionary.First().Value;
 
             eventAggregator.Subscribe(this);
             DisplayName = "Sensors";
             logger.Debug("Sensors view model created.");
-
-            PropertyChanged += SensorsViewModel_PropertyChanged;
         }
 
         public DeviceTelemetry Telemetry
@@ -49,10 +49,10 @@ namespace SOTA.DeviceEmulator.ViewModels
             set => Set(ref _speedDeviation, value, nameof(SpeedDeviation));
         }
 
-        public FunctionType PulseAlgorithm
+        public ITimeFunction<double> PulseFunction
         {
-            get => _pulseAlgorithm;
-            set => Set(ref _pulseAlgorithm, value, nameof(PulseAlgorithm));
+            get => _pulseFunction;
+            set => Set(ref _pulseFunction, value, nameof(PulseFunction));
         }
 
         public int PulseNoiseFactor
@@ -63,66 +63,30 @@ namespace SOTA.DeviceEmulator.ViewModels
 
         public string LocationText => "Location";
         public string PulseText => "Pulse";
+        public Dictionary<string, ITimeFunction<double>> FunctionDictionary { get; private set; }
 
         public void Handle(TelemetryCollected message)
         {
             Telemetry = message.Value;
         }
 
-        private void SensorsViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        private void InitializeFunctionDictionary(IEnumerable<ITimeFunction<double>> timeFunctions)
         {
-            switch (e.PropertyName)
-            {
-                case nameof(SpeedMean):
-                    SetSpeedMean();
-                    break;
-                case nameof(SpeedDeviation):
-                    SetSpeedDeviation();
-                    break;
-                case nameof(PulseAlgorithm):
-                    SetPulseAlgorithm();
-                    break;
-                case nameof(PulseNoiseFactor):
-                    SetPulseNoiseFactor();
-                    break;
-            }
-        }
-
-        private void ConfigureDeviceSensors()
-        {
-            SetSpeedMean();
-            SetSpeedDeviation();
-            SetPulseAlgorithm();
-            SetPulseNoiseFactor();
-        }
-
-        private void SetSpeedMean()
-        {
-            // UI has speed in m/s so need to convert to km/h
-            var speedInKilometers = SpeedMean * 3.6;
-            _device.LocationSensor.SpeedMean = speedInKilometers;
-        }
-
-        private void SetSpeedDeviation()
-        {
-            // UI has speed in m/s so need to convert to km/h
-            var speedInKilometers = SpeedDeviation * 3.6;
-            _device.LocationSensor.SpeedDeviation = speedInKilometers;
-        }
-
-        private void SetPulseAlgorithm()
-        {
-            switch (PulseAlgorithm)
-            {
-                case FunctionType.Harmonic:
-                    _device.PulseSensor.Function = new PulseHarmonicFunction();
-                    break;
-            }
-        }
-
-        private void SetPulseNoiseFactor()
-        {
-            _device.PulseSensor.NoiseFactor = _pulseNoiseFactor;
+            FunctionDictionary = timeFunctions
+                                  .Select(
+                                      function => new
+                                      {
+                                          Function = function,
+                                          Descriptions = (DescriptionAttribute[])function
+                                                                                 .GetType().GetCustomAttributes(
+                                                                                     typeof(DescriptionAttribute),
+                                                                                     false)
+                                      })
+                                  .ToDictionary(
+                                      i => i.Descriptions.Length > 0
+                                          ? i.Descriptions[0].Description
+                                          : i.Function.GetType().Name,
+                                      i => i.Function);
         }
     }
 }

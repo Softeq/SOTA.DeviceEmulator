@@ -3,19 +3,18 @@ using Newtonsoft.Json;
 using Nuke.Common;
 using Nuke.Common.BuildServers;
 using Nuke.Common.Execution;
+using Nuke.Common.IO;
 using Nuke.Common.ProjectModel;
 using Nuke.Common.Tooling;
 using Nuke.Common.Tools.DotNet;
 using Nuke.Common.Tools.GitVersion;
 using Nuke.Common.Tools.MSBuild;
-using Nuke.Common.Tools.NuGet;
 using static Nuke.Common.Logger;
 using static Nuke.Common.IO.FileSystemTasks;
 using static Nuke.Common.IO.PathConstruction;
 using static Nuke.Common.Tools.DotNet.DotNetTasks;
 using static Nuke.Common.Tools.MSBuild.MSBuildTasks;
 using static Nuke.Common.Tools.GitVersion.GitVersionTasks;
-using static Nuke.Common.Tools.NuGet.NuGetTasks;
 
 [CheckBuildProjectConfigurations]
 [UnsetVisualStudioEnvironmentVariables]
@@ -43,7 +42,8 @@ class Build : NukeBuild
     Target Restore => _ => _
         .Executes(() =>
         {
-            NuGetRestore(o => o.SetSolutionDirectory(Solution.Directory).SetWorkingDirectory(Solution.Directory));
+            DotNetRestore(o => o.SetProjectFile(Solution));
+            MSBuild(o => o.SetProjectFile(EntryProject).SetTargets("Restore"));
         });
 
     Target SetAssemblyVersion => _ => _
@@ -77,7 +77,7 @@ class Build : NukeBuild
                                var metadataScriptFilePath =
                                    // ReSharper disable once PossibleNullReferenceException
                                    Solution.GetProject("SOTA.DeviceEmulator.Build").Directory / "set-metadata.ps1";
-                               CopyFileToDirectory(metadataScriptFilePath, ArtifactsDirectory);
+                               CopyFileToDirectory(metadataScriptFilePath, ArtifactsDirectory, FileExistsPolicy.Overwrite);
                            });
 
     Target Test => _ => _

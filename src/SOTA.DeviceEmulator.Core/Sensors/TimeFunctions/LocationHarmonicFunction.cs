@@ -16,9 +16,6 @@ namespace SOTA.DeviceEmulator.Core.Sensors.TimeFunctions
         // Speed in kilometers per hour.
         public double Speed { get; set; } = 5;
 
-        // If true function will save previous call data to use it for current point calculation.
-        public bool TrajectoryMode { get; set; } = true;
-
         private DateTime _lastRequestTime = DateTime.MinValue;
         private double _lastRequestPhase;
 
@@ -27,17 +24,12 @@ namespace SOTA.DeviceEmulator.Core.Sensors.TimeFunctions
 
         public IPoint GetValue(DateTime time)
         {
-            var elapsedTime = TrajectoryMode
-                ? time - _lastRequestTime
-                : time - DateTime.MinValue;
+            var elapsedTime = time - _lastRequestTime;
             var phase = OscillationMath.CalculatePhase(elapsedTime, Period);
 
-            if (TrajectoryMode)
-            {
-                _lastRequestTime = time;
-                phase += _lastRequestPhase;
-                _lastRequestPhase = phase;
-            }
+             _lastRequestTime = time;
+             phase += _lastRequestPhase;
+             _lastRequestPhase = phase;
 
             var latitude = ZeroLatitude + OscillationMath.RadianToDegree(AngleCoefficient * Math.Cos(phase));
             var longitude = ZeroLongitude + OscillationMath.RadianToDegree(AngleCoefficient * Math.Sin(phase));
