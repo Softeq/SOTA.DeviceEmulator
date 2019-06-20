@@ -1,14 +1,15 @@
-using System.Linq;
+using System.IO;
+using Newtonsoft.Json;
 using Nuke.Common;
 using Nuke.Common.BuildServers;
 using Nuke.Common.Execution;
-using Nuke.Common.IO;
 using Nuke.Common.ProjectModel;
 using Nuke.Common.Tooling;
 using Nuke.Common.Tools.DotNet;
 using Nuke.Common.Tools.GitVersion;
 using Nuke.Common.Tools.MSBuild;
 using Nuke.Common.Tools.NuGet;
+using static Nuke.Common.Logger;
 using static Nuke.Common.IO.FileSystemTasks;
 using static Nuke.Common.IO.PathConstruction;
 using static Nuke.Common.Tools.DotNet.DotNetTasks;
@@ -24,14 +25,11 @@ class Build : NukeBuild
     readonly Configuration Configuration = IsLocalBuild ? Configuration.Debug : Configuration.Release;
 
     [Solution] readonly Solution Solution;
-
     BuildMetadata Metadata;
 
     Project EntryProject => Solution.GetProject("SOTA.DeviceEmulator");
-
     AbsolutePath ArtifactsDirectory => RootDirectory / "artifacts";
     AbsolutePath NuGetPackagesDirectory => RootDirectory / "packages";
-    AbsolutePath PackageDirectory => ArtifactsDirectory / "SOTA.DeviceEmulator";
 
     Target Clean => _ => _
                          .Before(Restore)
@@ -45,46 +43,41 @@ class Build : NukeBuild
     Target Restore => _ => _
         .Executes(() =>
         {
-            NuGetRestore(o => o.SetSolutionDirectory(Solution.Directory));
+            NuGetRestore(o => o.SetSolutionDirectory(Solution.Directory).SetWorkingDirectory(Solution.Directory));
         });
 
-    Target SetVersion => _ => _
+    Target SetAssemblyVersion => _ => _
         .Executes(() =>
         {
+            Info($"Build Version: {Metadata.BuildVersion}");
             var assemblyVersionFilePath = EntryProject.Directory / "Properties" / "AssemblyVersionInfo.cs";
-            var gitVersion = GitVersion(o =>
-                    o.SetEnsureAssemblyInfo(true)
-                     .SetArgumentConfigurator(a => a.Add($"/updateassemblyinfo \"{assemblyVersionFilePath}\"")))
-                .Result;
-            if (TeamServices.Instance != null)
-            {
-                TeamServices.Instance.UpdateBuildNumber(gitVersion.FullSemVer);
-            }
+            GitVersion(o =>
+                o.SetEnsureAssemblyInfo(true)
+                 .SetArgumentConfigurator(a => a.Add($"/updateassemblyinfo \"{assemblyVersionFilePath}\"")));
+        });
+
+    Target CiSetBuildMetadata => _ => _
+        .Executes(() =>
+        {
+            Metadata.SetToCi();
         });
 
     Target Package => _ => _
-                           .DependsOn(Restore, SetVersion)
+                           .DependsOn(Restore, SetAssemblyVersion)
                            .Executes(() =>
                            {
                                MSBuild(o =>
                                    o.SetProjectFile(EntryProject)
                                     .SetConfiguration(Configuration)
-                                    .SetTargets("Publish")
-                                    .AddProperty("PublishDir", PackageDirectory + "\\")
-                                    .AddProperty("ProductName", Metadata.ClickOnceProductName)
-                                    .AddProperty("ApplicationVersion", Metadata.ClickOnceApplicationVersion)
-                                    .AddProperty("EntryAssemblyName", Metadata.EntryAssemblyName));
-                               // Application manifest file (.application) is not generated when publish package is generated
-                               // using MSBuild. But we need it for an ability to install older versions
-                               // So we apply a hack to copy it manually similarly to this answer in StackOverflow
-                               // https://stackoverflow.com/questions/23221089/missing-manifest-file-in-applicationfiles-folder-with-msbuild-in-nant-task
-                               var applicationManifestFile = GlobFiles(PackageDirectory, "*.application").First();
-                               var clickOnceUnderscoreVersion = Metadata.ClickOnceApplicationVersion.Replace(".", "_");
-                               var clickOnceVersionFolderName =
-                                   $"{Metadata.EntryAssemblyName}_{clickOnceUnderscoreVersion}";
-                               var versionedApplicationDirectory =
-                                   PackageDirectory / "Application Files" / clickOnceVersionFolderName;
-                               CopyFileToDirectory(applicationManifestFile, versionedApplicationDirectory, FileExistsPolicy.Overwrite);
+                                    .SetTargets("Build")
+                                    .AddProperty("OutDir", ArtifactsDirectory));
+                               var metadataJson = JsonConvert.SerializeObject(Metadata);
+                               var metadataFilePath = ArtifactsDirectory / "app-package.json";
+                               File.WriteAllText(metadataFilePath, metadataJson);
+                               var metadataScriptFilePath =
+                                   // ReSharper disable once PossibleNullReferenceException
+                                   Solution.GetProject("SOTA.DeviceEmulator.Build").Directory / "set-metadata.ps1";
+                               CopyFileToDirectory(metadataScriptFilePath, ArtifactsDirectory);
                            });
 
     Target Test => _ => _
@@ -101,7 +94,9 @@ class Build : NukeBuild
                                     {
                                         return config;
                                     }
-                                    var testResultsFile = Solution.Directory / "TestResults" / $"{testProject.Name}.TestResults.trx";
+
+                                    var testResultsFile =
+                                        Solution.Directory / "TestResults" / $"{testProject.Name}.TestResults.trx";
                                     config = config.SetLogger($"trx;LogFileName={testResultsFile}");
                                     return config;
                                 });
@@ -112,7 +107,7 @@ class Build : NukeBuild
         .DependsOn(Test, Package);
 
     Target CiBuild => _ => _
-        .DependsOn(Clean, Test, Package);
+        .DependsOn(CiSetBuildMetadata, Clean, Test, Package);
 
     /// Support plugins are available for:
     /// - JetBrains ReSharper        https://nuke.build/resharper

@@ -24,3 +24,17 @@ After installing all required dependencies, make sure you can build the project 
 # Or you can do the same with
 ./build LocalBuild
 ```
+
+## Releases
+
+The application binaries are published to an internal [Azure Artifacts feed](https://dev.azure.com/SofteqDevelopment/SOTA/_packaging?_a=feed&feed=SOTA). Beta and stable releases are also published to GitHub.
+
+From the developer perspective the release flow can be described as follows:
+
+1. Develop and merge several feature or bugfix pull requests targeting develop branch (`feature/XXXX_[feature-name] → develop`).
+2. On code freeze day create a release branch and open a release PR (`release/x.x.x → master`).
+3. Fix known critical and major bugs using bugfix PRs targeting release branch (`bugfix/XXXX_[bug-name] → release/x.x.x`). 
+4. Create and publish beta release in Azure Pipelines.
+5. Wait until regression and user acceptance testing is finished.
+6. Merge release branch to master and develop.
+6. Approve to publish stable release in Azure Pipelines.

@@ -8,3 +8,7 @@ dotnet_style_require_accessibility_modifiers = never:warning
 csharp_style_expression_bodied_properties = true:warning
 csharp_style_expression_bodied_indexers = true:warning
 csharp_style_expression_bodied_accessors = true:warning
+
+# Private fields must be camelCase
+# https://github.com/DotNetAnalyzers/StyleCopAnalyzers/blob/master/documentation/SA1306.md
+dotnet_naming_rule.stylecop_private_fields_must_be_camel_case_rule.severity    = none
