@@ -19,11 +19,14 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition />
                 <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="{Binding Source={StaticResource SpacingLarge}}" />
+                <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
             <TextBlock Grid.Column="0"
                        Text="Logs"
                        Style="{StaticResource SubtitleTextBlock}" />
-            <Button Grid.Column="1" Name="Clear">Clear</Button>
+            <CheckBox Grid.Column="1" Name="AutoScrollCheckbox" IsThreeState="False">Automatically scroll to the latest row.</CheckBox>
+            <Button Grid.Column="3" Name="Clear">Clear</Button>
         </Grid>
         <DataGrid Name="LogsDataGrid"
                   Grid.Row="1"

@@ -18,15 +18,14 @@ namespace SOTA.DeviceEmulator.Views
 
         private void ScrollToTheEnd(object sender, NotifyCollectionChangedEventArgs e)
         {
-            if (LogsDataGrid.Items.Count > 0)
+            var isScrollCheckboxChecked = AutoScrollCheckbox.IsChecked ?? false;
+
+            if (isScrollCheckboxChecked &&
+                LogsDataGrid.Items.Count > 0 &&
+                VisualTreeHelper.GetChild(LogsDataGrid, 0) is Decorator border &&
+                border.Child is ScrollViewer scroll)
             {
-                if (VisualTreeHelper.GetChild(LogsDataGrid, 0) is Decorator border)
-                {
-                    if (border.Child is ScrollViewer scroll)
-                    {
-                        scroll.ScrollToEnd();
-                    }
-                }
+                 scroll.ScrollToEnd();
             }
         }
     }
