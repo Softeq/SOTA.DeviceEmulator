@@ -10,8 +10,6 @@ Make sure that the following dependencies are installed:
 
 * [Visual Studio 2019](https://visualstudio.microsoft.com/downloads/)
 * [.NET Core 2.2 SDK](https://dotnet.microsoft.com/download/dotnet-core)
-* [Azure CLI](https://docs.microsoft.com/en-us/cli/azure)
-* [Terraform](https://chocolatey.org/packages/terraform)
 
 Also, there are several extensions and applications that you may find useful during development:
 
