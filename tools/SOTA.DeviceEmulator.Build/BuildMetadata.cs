@@ -1,24 +1,39 @@
-using System.Collections.Generic;
 using System.Globalization;
+using Colorful;
+using Nuke.Common.BuildServers;
 using Nuke.Common.Tools.GitVersion;
 
 class BuildMetadata
 {
     public BuildMetadata(GitVersion gitVersion)
     {
-        var nameParts = new List<string> {"SOTA Device Emulator"};
-        var releaseType = CultureInfo.InvariantCulture.TextInfo.ToTitleCase(gitVersion.PreReleaseLabel ?? "Stable");
-        if (!string.IsNullOrEmpty(gitVersion.PreReleaseLabel))
-        {
-            nameParts.Add(releaseType);
-        }
-        ClickOnceProductName = string.Join(" ", nameParts);
-        ClickOnceApplicationVersion = $"{gitVersion.MajorMinorPatch}.{gitVersion.PreReleaseNumber}";
-        EntryAssemblyName = $"SOTA.DeviceEmulator.{releaseType}";
+        BuildVersion = gitVersion.FullSemVer;
+        ReleaseGitTag = $"v{gitVersion.FullSemVer}";
+        UniversalPackageVersion = gitVersion.NuGetVersionV2;
+        ReleaseType = CultureInfo.InvariantCulture.TextInfo.ToTitleCase(gitVersion.PreReleaseLabel ?? "stable");
     }
 
-    public string ClickOnceProductName { get; private set; }
-    public string ClickOnceApplicationVersion { get; private set; }
-    // We need a different assembly name to allow side-by-side installation of versions from different channels (alpha, beta, stable) in ClickOnce.
-    public string EntryAssemblyName { get; private set; }
+    public string BuildVersion { get; }
+    public string ReleaseGitTag { get; }
+    public string UniversalPackageVersion { get; }
+    public string UniversalPackageDescription => $"SOTA Device Emulator ({ReleaseType} channel)";
+    public string ReleaseType { get; }
+
+    public void SetToCi()
+    {
+        if (TeamServices.Instance == null)
+        {
+            return;
+        }
+        TeamServices.Instance.UpdateBuildNumber(BuildVersion);
+        Set(nameof(UniversalPackageVersion), UniversalPackageVersion);
+        Set(nameof(UniversalPackageDescription), UniversalPackageDescription);
+        Set(nameof(ReleaseType), ReleaseType);
+        Set(nameof(ReleaseGitTag), ReleaseGitTag);
+    }
+
+    static void Set(string name, string value)
+    {
+        Console.WriteLine($"##vso[task.setvariable variable={name}]{value}");
+    }
 }
