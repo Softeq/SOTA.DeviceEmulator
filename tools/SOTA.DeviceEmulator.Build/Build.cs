@@ -43,7 +43,6 @@ class Build : NukeBuild
         .Executes(() =>
         {
             DotNetRestore(o => o.SetProjectFile(Solution));
-            ///MSBuild(o => o.SetProjectFile(EntryProject).SetTargets("Restore"));
         });
 
     Target SetAssemblyVersion => _ => _
