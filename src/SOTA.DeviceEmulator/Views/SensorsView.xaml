@@ -1,20 +1,147 @@
-﻿<UserControl x:Class="SOTA.DeviceEmulator.Views.SensorsView"
+<UserControl x:Class="SOTA.DeviceEmulator.Views.SensorsView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:SOTA.DeviceEmulator.Views"
              xmlns:viewModels="clr-namespace:SOTA.DeviceEmulator.ViewModels"
+             xmlns:toolkit="http://schemas.xceed.com/wpf/xaml/toolkit"
+             xmlns:converters="clr-namespace:SOTA.DeviceEmulator.Views.Converters"
              mc:Ignorable="d"
              d:DesignHeight="450" 
              d:DesignWidth="800" 
              d:DataContext="{d:DesignInstance viewModels:SensorsViewModel}">
-    <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition/>
-        </Grid.ColumnDefinitions>
-        <TextBlock Grid.Column="0" Text="Sensor value: "/>
-        <TextBlock Grid.Column="1" Text="{Binding Value}" />
-    </Grid>
+    <UserControl.Resources>
+        <converters:LatLongToStringConverter x:Key="LatLongToStringConverter"/>
+    </UserControl.Resources>
+    <StackPanel>
+        <TextBlock
+            Text="{Binding LocationText}"
+            Style="{StaticResource SubtitleTextBlock}" />
+        <Grid Margin="{StaticResource ThicknessMediumTop}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="200"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="{Binding Source={StaticResource SpacingLarge}}"/>
+                <ColumnDefinition Width="1*"/>
+            </Grid.ColumnDefinitions>
+            <GroupBox Header="Last Reported Value" Grid.Column="0">
+                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition />
+                            <RowDefinition />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="{Binding Source={StaticResource SpacingSmall}}"/>
+                            <ColumnDefinition Width="1*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Row="0"
+                                   Grid.Column="0"
+                                   Text="Latitude:"
+                                   HorizontalAlignment="Right"
+                                   Style="{StaticResource SubtitleTextBlock}"/>
+                        <TextBlock Grid.Row="0"
+                                   Grid.Column="2"
+                                   Text="{Binding Telemetry.Latitude, Converter={StaticResource LatLongToStringConverter}}"
+                                   Style="{StaticResource SubtitleTextBlock}"/>
+                        <TextBlock Grid.Row="1"
+                                   Grid.Column="0"
+                                   Text="Longitude:"
+                                   HorizontalAlignment="Right"
+                                   Style="{StaticResource SubtitleTextBlock}"/>
+                        <TextBlock Grid.Row="1"
+                                   Grid.Column="2"
+                                   Text="{Binding Telemetry.Longitude, Converter={StaticResource LatLongToStringConverter}}"
+                                   Style="{StaticResource SubtitleTextBlock}"/>
+                    </Grid>
+                </StackPanel>
+            </GroupBox>
+            <GroupBox Header="Settings" Grid.Column="2">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="{Binding Source={StaticResource SpacingLarge}}"/>
+                        <ColumnDefinition Width="1*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="{Binding Source={StaticResource SpacingSmall}}"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Speed (km/h, mean)"/>
+                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Speed (km/h, std)"/>
+                    <toolkit:DoubleUpDown
+                        Grid.Row="0"
+                        Grid.Column="2"
+                        FormatString="N1"
+                        Value="{Binding SpeedMean}"
+                        Increment="0.1"
+                        Minimum="1"
+                        Maximum="50"/>
+                    <toolkit:DoubleUpDown
+                        Grid.Row="2"
+                        Grid.Column="2"
+                        FormatString="N1"
+                        Value="{Binding SpeedDeviation}"
+                        Increment="0.1"
+                        Minimum="0"
+                        Maximum="{Binding SpeedMean}"/>
+                </Grid>
+            </GroupBox>
+        </Grid>
+        <TextBlock
+            Text="{Binding PulseText}"
+            Style="{StaticResource SubtitleTextBlock}"
+            Margin="{StaticResource ThicknessMediumTop}"/>
+        <Grid Margin="{StaticResource ThicknessMediumTop}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="200"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="{Binding Source={StaticResource SpacingLarge}}"/>
+                <ColumnDefinition Width="1*"/>
+            </Grid.ColumnDefinitions>
+            <GroupBox Header="Last Reported Value" Grid.Column="0">
+                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <TextBlock Text="{Binding Telemetry.Pulse}" Style="{StaticResource SubtitleTextBlock}"/>
+                </StackPanel>
+            </GroupBox>
+            <GroupBox Header="Settings" Grid.Column="2">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="{Binding Source={StaticResource SpacingLarge}}"/>
+                        <ColumnDefinition Width="1*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="{Binding Source={StaticResource SpacingSmall}}"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Generator Algorithm" VerticalAlignment="Center"/>
+                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Noise Factor"/>
+                    <StackPanel Grid.Row="0" Grid.Column="2" Orientation="Vertical">
+                        <ComboBox ItemsSource="{Binding TimeFunctions}"
+                                  SelectedValue="{Binding PulseFunction}"
+                                  DisplayMemberPath="DisplayName"/>
+                    </StackPanel>
+                    <toolkit:IntegerUpDown
+                        Grid.Row="2"
+                        Grid.Column="2"
+                        FormatString="N1"
+                        Value="{Binding PulseNoiseFactor}"
+                        Increment="1"
+                        Minimum="0"
+                        Maximum="30"/>
+                </Grid>
+            </GroupBox>
+        </Grid>
+    </StackPanel>
 </UserControl>

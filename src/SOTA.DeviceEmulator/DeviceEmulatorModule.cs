@@ -1,11 +1,14 @@
-﻿using System.Collections.ObjectModel;
+using System.Collections.ObjectModel;
 using Autofac;
 using Caliburn.Micro;
 using EnsureThat;
+using GeoAPI.Geometries;
 using MediatR;
 using Microsoft.Extensions.Hosting;
 using Serilog;
 using SOTA.DeviceEmulator.Core;
+using SOTA.DeviceEmulator.Core.Sensors;
+using SOTA.DeviceEmulator.Core.Sensors.TimeFunctions;
 using SOTA.DeviceEmulator.Services.Infrastructure.Jobs;
 using SOTA.DeviceEmulator.Services.Infrastructure.Logging;
 using SOTA.DeviceEmulator.ViewModels;
@@ -51,8 +54,8 @@ namespace SOTA.DeviceEmulator
             builder.RegisterAssemblyTypes(ThisAssembly)
                 .AssignableTo<ITabViewModel>()
                 .AsSelf()
-                .As<ITabViewModel>()
-                .InstancePerDependency();
+                .AsImplementedInterfaces()
+                .SingleInstance();
             builder.RegisterAssemblyTypes(ThisAssembly)
                 .AssignableTo<PropertyChangedBase>()
                 .AsSelf()
@@ -72,6 +75,26 @@ namespace SOTA.DeviceEmulator
                 .RegisterAssemblyTypes(ThisAssembly)
                 .AsClosedTypesOf(typeof(INotificationHandler<>))
                 .SingleInstance();
+
+            builder
+                .RegisterAssemblyTypes(typeof(ISensor).Assembly)
+                .AssignableTo<ISensor>()
+                .As<ISensor>()
+                .InstancePerDependency();
+            builder
+                .RegisterType<Device>()
+                .As<IDevice>()
+                .SingleInstance();
+            builder
+                .RegisterAssemblyTypes(typeof(ITimeFunction<>).Assembly)
+                .AssignableTo<ITimeFunction<double>>()
+                .As<ITimeFunction<double>>()
+                .InstancePerDependency();
+            builder
+                .RegisterAssemblyTypes(typeof(ITimeFunction<>).Assembly)
+                .AssignableTo<ITimeFunction<IPoint>>()
+                .As<ITimeFunction<IPoint>>()
+                .InstancePerDependency();
         }
     }
 }

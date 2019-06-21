@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using GeoAPI.Geometries;
 using NetTopologySuite.Algorithm.Distance;
@@ -10,15 +10,15 @@ namespace SOTA.DeviceEmulator.Core.Tests.Sensors.TimeFunctions
 {
     public class LocationHarmonicFunctionTest
     {
-        private readonly IPoint _zeroPoint = EarthGeometry.GeometryFactory.CreatePoint(new Coordinate(28.211944, 36.438685));
+        private readonly IPoint _zeroPoint = EarthGeometry.GeometryFactory.CreatePoint(
+            new Coordinate(
+                LocationHarmonicFunction.ZeroLongitude,
+                LocationHarmonicFunction.ZeroLatitude));
 
         private readonly LocationHarmonicFunction _locationFunction;
 
         // Used for rounding distance in km to 4 digits after a comma.
         private const double DistanceComparisonPrecision = 10000;
-
-        // Trajectory circle radius on the earth's surface.
-        private double TrajectoryRadius => 3;
 
         public static IEnumerable<object[]> Data =>
             new List<object[]>
@@ -46,7 +46,7 @@ namespace SOTA.DeviceEmulator.Core.Tests.Sensors.TimeFunctions
 
             var distanceInKm = RoundWithPrecision(EarthGeometry.ConvertAngleSizeToDistance(distance.Distance), DistanceComparisonPrecision);
 
-            Assert.Equal(TrajectoryRadius, distanceInKm);
+            Assert.Equal(LocationHarmonicFunction.TrajectoryRadius, distanceInKm);
         }
 
         private double RoundWithPrecision(double value, double precision)

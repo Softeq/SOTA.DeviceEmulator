@@ -26,8 +26,6 @@ namespace SOTA.DeviceEmulator.ViewModels
             connectionViewModel.ConnectionStatusChanged += statusBarViewModel.ToggleConnectionStatus;
         }
 
-        
-
         public string DeviceDisplayName { get; }
 
         public StatusBarViewModel StatusBar { get; }

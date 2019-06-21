@@ -1,8 +1,8 @@
-﻿using System;
+using System;
 
 namespace SOTA.DeviceEmulator.Core
 {
-    internal class SystemClock : IClock
+    public class SystemClock : IClock
     {
         private static readonly Lazy<SystemClock> InstanceLazy = new Lazy<SystemClock>(() => new SystemClock());
 

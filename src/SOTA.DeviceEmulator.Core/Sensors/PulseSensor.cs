@@ -1,21 +1,18 @@
-﻿using System;
+using System;
 using EnsureThat;
-using SOTA.DeviceEmulator.Core.Sensors.TimeFunctions;
 
 namespace SOTA.DeviceEmulator.Core.Sensors
 {
-    public class PulseSensor
+    public class PulseSensor : ISensor
     {
-        private readonly ITimeFunction<double> _function;
         private readonly Random _random;
+        private readonly IPulseSensorOptions _sensorOptions;
 
-        public PulseSensor(ITimeFunction<double> function)
+        public PulseSensor(IPulseSensorOptions pulseSensorOptions)
         {
-            _function = Ensure.Any.IsNotNull(function, nameof(function));
             _random = new Random();
+            _sensorOptions = Ensure.Any.IsNotNull(pulseSensorOptions, nameof(pulseSensorOptions));
         }
-
-        public int NoiseFactor { get; set; } = 5;
 
         public int GetValue(DateTime currentTime)
         {
@@ -25,16 +22,21 @@ namespace SOTA.DeviceEmulator.Core.Sensors
             return deterministicPart + randomPart;
         }
 
+        public void Report(DeviceTelemetry telemetry, DateTime time)
+        {
+            telemetry.Pulse = GetValue(time);
+        }
+
         private int GetDeterministicPart(DateTime currentTime)
         {
             return (int)Math.Round(
-                _function.GetValue(currentTime),
+                _sensorOptions.PulseFunction.GetValue(currentTime),
                 MidpointRounding.AwayFromZero);
         }
 
         private int GetRandomPart()
         {
-            return _random.Next(NoiseFactor * -1, NoiseFactor);
+            return _random.Next(_sensorOptions.PulseNoiseFactor * -1, _sensorOptions.PulseNoiseFactor);
         }
     }
 }
