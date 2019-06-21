@@ -20,13 +20,7 @@ namespace SOTA.DeviceEmulator.Core.Sensors
         public ILocationFunction Function
         {
             get => _function;
-            set
-            {
-                if (value != null)
-                {
-                    _function = value;
-                }
-            }
+            set => _function = value ?? throw new ArgumentNullException(nameof(value), "Location function can not be null");
         }
 
         public IPoint GetValue(DateTime currentTime)

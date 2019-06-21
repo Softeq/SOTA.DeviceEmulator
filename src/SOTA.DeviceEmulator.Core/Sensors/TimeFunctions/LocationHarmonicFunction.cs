@@ -8,6 +8,7 @@ namespace SOTA.DeviceEmulator.Core.Sensors.TimeFunctions
     {
         // Trajectory circle radius on the earth's surface in kilometers.
         public static double TrajectoryRadius => 3;
+        public string DisplayName => "Harmonic";
 
         // Central point of circle trajectory. Yellowstone National Park, WY, USA.
         public static double ZeroLatitude => 44.548004;

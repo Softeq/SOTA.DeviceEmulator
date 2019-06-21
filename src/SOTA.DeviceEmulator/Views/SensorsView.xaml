@@ -128,10 +128,9 @@
                     <TextBlock Grid.Row="0" Grid.Column="0" Text="Generator Algorithm" VerticalAlignment="Center"/>
                     <TextBlock Grid.Row="2" Grid.Column="0" Text="Noise Factor"/>
                     <StackPanel Grid.Row="0" Grid.Column="2" Orientation="Vertical">
-                        <ComboBox ItemsSource="{Binding FunctionDictionary}"
+                        <ComboBox ItemsSource="{Binding TimeFunctions}"
                                   SelectedValue="{Binding PulseFunction}"
-                                  DisplayMemberPath="Key"
-                                  SelectedValuePath="Value"/>
+                                  DisplayMemberPath="DisplayName"/>
                     </StackPanel>
                     <toolkit:IntegerUpDown
                         Grid.Row="2"

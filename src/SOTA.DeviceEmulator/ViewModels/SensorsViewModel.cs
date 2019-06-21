@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using Caliburn.Micro;
 using EnsureThat;
@@ -23,8 +22,8 @@ namespace SOTA.DeviceEmulator.ViewModels
         {
             Ensure.Any.IsNotNull(eventAggregator, nameof(eventAggregator));
 
-            InitializeFunctionDictionary(doubleTimeFunctions);
-            PulseFunction = FunctionDictionary.First().Value;
+            TimeFunctions = doubleTimeFunctions.ToList();
+            PulseFunction = TimeFunctions.First();
 
             eventAggregator.Subscribe(this);
             DisplayName = "Sensors";
@@ -63,30 +62,11 @@ namespace SOTA.DeviceEmulator.ViewModels
 
         public string LocationText => "Location";
         public string PulseText => "Pulse";
-        public Dictionary<string, ITimeFunction<double>> FunctionDictionary { get; private set; }
+        public List<ITimeFunction<double>> TimeFunctions { get; }
 
         public void Handle(TelemetryCollected message)
         {
             Telemetry = message.Value;
-        }
-
-        private void InitializeFunctionDictionary(IEnumerable<ITimeFunction<double>> timeFunctions)
-        {
-            FunctionDictionary = timeFunctions
-                                  .Select(
-                                      function => new
-                                      {
-                                          Function = function,
-                                          Descriptions = (DescriptionAttribute[])function
-                                                                                 .GetType().GetCustomAttributes(
-                                                                                     typeof(DescriptionAttribute),
-                                                                                     false)
-                                      })
-                                  .ToDictionary(
-                                      i => i.Descriptions.Length > 0
-                                          ? i.Descriptions[0].Description
-                                          : i.Function.GetType().Name,
-                                      i => i.Function);
         }
     }
 }
