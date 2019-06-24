@@ -1,19 +1,32 @@
 using System;
+using System.Collections.Generic;
+using System.ComponentModel;
 using System.Threading.Tasks;
 using System.Windows;
 using Caliburn.Micro;
+using EnsureThat;
+using SOTA.DeviceEmulator.Services.Provisioning;
 
 namespace SOTA.DeviceEmulator.ViewModels
 {
     public sealed class ConnectionViewModel : Screen, ITabViewModel
     {
+        private readonly IConnectionOptions _connectionOptions;
         private bool _isConnected;
         private string _certificatePath;
+        private string _selectedEnvironment;
 
-        public ConnectionViewModel()
+        public ConnectionViewModel(IConnectionOptions connectionOptions)
         {
+            _connectionOptions = Ensure.Any.IsNotNull(connectionOptions, nameof(connectionOptions));
+            _selectedEnvironment = _connectionOptions.DefaultEnvironment;
             DisplayName = "Connection";
             HeaderText = "Connection Settings";
+        }
+
+        [DesignOnly(true)]
+        private ConnectionViewModel()
+        {
         }
 
         public event EventHandler<ConnectionStatusChangedEventArgs> ConnectionStatusChanged;
@@ -23,6 +36,13 @@ namespace SOTA.DeviceEmulator.ViewModels
         public bool CanConnect => !string.IsNullOrEmpty(_certificatePath);
         public bool CanBrowseFiles => !_isConnected;
 
+        public IReadOnlyCollection<string> Environments => _connectionOptions.Environments;
+
+        public string SelectedEnvironment
+        {
+            get => _selectedEnvironment;
+            set => Set(ref _selectedEnvironment, value, nameof(SelectedEnvironment));
+        }
 
         public bool IsConnected
         {

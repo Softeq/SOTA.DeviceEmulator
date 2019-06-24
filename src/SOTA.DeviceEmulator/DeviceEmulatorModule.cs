@@ -11,6 +11,7 @@ using SOTA.DeviceEmulator.Core.Sensors;
 using SOTA.DeviceEmulator.Core.Sensors.TimeFunctions;
 using SOTA.DeviceEmulator.Services.Infrastructure.Jobs;
 using SOTA.DeviceEmulator.Services.Infrastructure.Logging;
+using SOTA.DeviceEmulator.Services.Settings;
 using SOTA.DeviceEmulator.ViewModels;
 
 namespace SOTA.DeviceEmulator
@@ -75,6 +76,10 @@ namespace SOTA.DeviceEmulator
                 .RegisterAssemblyTypes(ThisAssembly)
                 .AsClosedTypesOf(typeof(INotificationHandler<>))
                 .SingleInstance();
+
+            builder.RegisterType<ApplicationSettings>()
+                   .AsImplementedInterfaces()
+                   .SingleInstance();
 
             builder
                 .RegisterAssemblyTypes(typeof(ISensor).Assembly)

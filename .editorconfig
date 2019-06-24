@@ -207,8 +207,11 @@ csharp_space_between_square_brackets = false
 
 # camel_case_style - Define the camelCase style
 dotnet_naming_style.camel_case_style.capitalization = camel_case
-# pascal_case_style - Define the Pascal_case style
+# pascal_case_style - Define the PascalCase style
 dotnet_naming_style.pascal_case_style.capitalization = pascal_case
+# prefix_underscore style
+dotnet_naming_style.prefix_underscore.capitalization = camel_case
+dotnet_naming_style.prefix_underscore.required_prefix = _
 # first_upper_style - The first character must start with an upper-case character
 dotnet_naming_style.first_upper_style.capitalization = first_word_upper
 # prefix_interface_with_i_style - Interfaces must be PascalCase and the first character of an interface must be an 'I'
@@ -296,7 +299,7 @@ dotnet_naming_rule.stylecop_instance_fields_must_be_private_rule.severity       
 dotnet_naming_symbols.stylecop_private_fields_group.applicable_accessibilities = private
 dotnet_naming_symbols.stylecop_private_fields_group.applicable_kinds           = field
 dotnet_naming_rule.stylecop_private_fields_must_be_camel_case_rule.symbols     = stylecop_private_fields_group
-dotnet_naming_rule.stylecop_private_fields_must_be_camel_case_rule.style       = camel_case_style
+dotnet_naming_rule.stylecop_private_fields_must_be_camel_case_rule.style       = prefix_underscore
 dotnet_naming_rule.stylecop_private_fields_must_be_camel_case_rule.severity    = warning
 
 # Local variables must be camelCase
