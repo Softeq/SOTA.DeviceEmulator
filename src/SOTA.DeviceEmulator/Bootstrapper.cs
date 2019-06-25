@@ -1,17 +1,20 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Caliburn.Micro;
+using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
 using Serilog.Core;
 using Serilog.Events;
 using SOTA.DeviceEmulator.Services.Infrastructure.Logging;
+using SOTA.DeviceEmulator.Services.Provisioning;
 using SOTA.DeviceEmulator.ViewModels;
 
 namespace SOTA.DeviceEmulator
@@ -20,6 +23,7 @@ namespace SOTA.DeviceEmulator
     {
         private IHost _host;
         private ILogger _logger;
+        private ObservableCollectionLogEventSink _uiLogSink;
 
         public Bootstrapper()
         {
@@ -31,8 +35,9 @@ namespace SOTA.DeviceEmulator
         protected override void Configure()
         {
             var logCollection = new ObservableCollection<LogEventViewModel>();
+            _uiLogSink = new ObservableCollectionLogEventSink(logCollection);
             _logger = new LoggerConfiguration()
-                .UseSotaDeviceEmulatorConfiguration(logCollection, LogEventLevel.Debug)
+                .UseSotaDeviceEmulatorConfiguration(_uiLogSink, LogEventLevel.Debug)
                 .CreateLogger()
                 .ForContext(GetType());
             var app = new DeviceEmulatorModule(_logger, logCollection);
@@ -52,6 +57,8 @@ namespace SOTA.DeviceEmulator
 
         protected override void OnExit(object sender, EventArgs e)
         {
+            _uiLogSink.IsEnabled = false;
+            Task.Run(() => Container.Resolve<IMediator>().Send(new DisconnectCommand())).Wait();
             _host?.Dispose();
         }
 

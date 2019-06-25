@@ -46,6 +46,7 @@ namespace SOTA.DeviceEmulator.ViewModels
 
         protected override async void OnInitialize()
         {
+            base.OnInitialize();
             var connection = await _mediator.Send(new GetConnectionQuery());
             DeviceDisplayName = connection.DeviceDisplayName;
         }
