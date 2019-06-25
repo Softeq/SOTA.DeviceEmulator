@@ -5,22 +5,28 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:SOTA.DeviceEmulator.Views"
              xmlns:converters="clr-namespace:SOTA.DeviceEmulator.Views.Converters"
+             xmlns:viewModels="clr-namespace:SOTA.DeviceEmulator.ViewModels"
+             xmlns:adonisUi="clr-namespace:AdonisUI;assembly=AdonisUI"
              mc:Ignorable="d"
-             d:DesignHeight="450" d:DesignWidth="800">
+             d:DesignHeight="450"
+             d:DesignWidth="800"
+             d:DataContext="{d:DesignInstance viewModels:ConnectionViewModel}">
     <UserControl.Resources>
         <converters:ConnectionStatusBooleanToTextConverter x:Key="ConnectionStatusBooleanToTextConverter"/>
     </UserControl.Resources>
-    <StackPanel>
+    <StackPanel Margin="{StaticResource ThicknessSmallLeftRight}">
         <TextBlock
             Text="{Binding HeaderText}"
             Style="{StaticResource SubtitleTextBlock}" />
         <Grid Margin="{StaticResource ThicknessLargeTop}">
             <Grid.Resources>
                 <Style TargetType="Border" >
-                    <Setter Property="Margin" Value="{StaticResource ThicknessSmallAllSides}"/>
+                    <Setter Property="Margin" Value="{StaticResource ThicknessSmallTopBottom}"/>
                 </Style>
             </Grid.Resources>
             <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
@@ -33,27 +39,58 @@
                 <TextBlock VerticalAlignment="Center" Text="Environment"/>
             </Border>
             <Border Grid.Row="0" Grid.Column="2">
-                <ComboBox/>
+                <ComboBox ItemsSource="{Binding Environments, Mode=OneTime}" SelectedItem="{Binding SelectedEnvironment}"/>
             </Border>
             <Border Grid.Row="1" Grid.Column="0">
-                <TextBlock VerticalAlignment="Center" Text="Device Certificate"/>
+                <TextBlock Text="Endpoint"/>
             </Border>
             <Border Grid.Row="1" Grid.Column="2">
+                <TextBlock Text="{Binding DeviceProvisioningServiceEndpoint, Mode=OneTime}"/>
+            </Border>
+            <Border Grid.Row="2" Grid.Column="0">
+                <TextBlock Text="ID Scope"/>
+            </Border>
+            <Border Grid.Row="2" Grid.Column="2">
+                <TextBlock Text="{Binding DeviceProvisioningServiceIdScope, Mode=OneWay}"/>
+            </Border>
+            <Border Grid.Row="3" Grid.Column="0">
+                <TextBlock VerticalAlignment="Center" Text="Device Certificate"/>
+            </Border>
+            <Border Grid.Row="3" Grid.Column="2">
                 <DockPanel LastChildFill="True">
+                    <DockPanel.Resources>
+                        <Style TargetType="{x:Type Button}">
+                            <Setter Property="Margin" Value="{StaticResource ThicknessSmallLeft}"/>
+                        </Style>
+                    </DockPanel.Resources>
                     <Button DockPanel.Dock="Right">Create New</Button>
                     <Button Name="BrowseFiles" DockPanel.Dock="Right">Browse</Button>
                     <TextBox IsReadOnly="True" Text="{Binding CertificatePath}"/>
                 </DockPanel>
             </Border>
         </Grid>
-        <WrapPanel Margin="{StaticResource ThicknessSmallAllSides}">
-            <Button Name="Connect"
-                    DockPanel.Dock="Left"
-                    Content="{Binding IsConnected,
+        <TextBlock
+            Margin="{StaticResource ThicknessMediumTopBottom}"
+            VerticalAlignment="Stretch"
+            Text="{Binding ConnectionError, Mode=OneWay}"
+            TextWrapping="Wrap"
+            Foreground="{StaticResource {x:Static adonisUi:Brushes.ErrorBrush}}"/>
+        <Button Name="Connect"
+                HorizontalAlignment="Left">
+            <StackPanel Orientation="Horizontal">
+                <ContentControl Focusable="False"
+                                Margin="{StaticResource ThicknessSmallRight}"
+                                ContentTemplate="{StaticResource {x:Static adonisUi:Templates.LoadingCircle}}"
+                                Foreground="{StaticResource {x:Static adonisUi:Brushes.ForegroundBrush}}"
+                                Visibility="{Binding IsLoading, Mode=OneWay, Converter={StaticResource BoolToCollapsedConverter}}"
+                                Width="16"
+                                Height="16"/>
+                <TextBlock
+                    Text="{Binding IsConnected,
                         Mode=OneWay,
                         Converter={StaticResource ConnectionStatusBooleanToTextConverter},
-                        ConverterParameter='ButtonLabel'}"
-            />
-        </WrapPanel>
+                        ConverterParameter='ButtonLabel'}"/>
+            </StackPanel>
+        </Button>
     </StackPanel>
 </UserControl>

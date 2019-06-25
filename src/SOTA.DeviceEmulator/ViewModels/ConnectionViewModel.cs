@@ -1,16 +1,33 @@
 using System;
+using System.Collections.Generic;
+using System.ComponentModel;
 using System.Threading.Tasks;
-using System.Windows;
 using Caliburn.Micro;
+using EnsureThat;
+using MediatR;
+using SOTA.DeviceEmulator.Services.Provisioning;
 
 namespace SOTA.DeviceEmulator.ViewModels
 {
     public sealed class ConnectionViewModel : Screen, ITabViewModel
     {
+        private readonly IMediator _mediator;
+        private readonly IConnectionOptions _connectionOptions;
         private bool _isConnected;
         private string _certificatePath;
+        private string _selectedEnvironment;
+        private string _connectionError;
+        private bool _isLoading;
 
-        public ConnectionViewModel()
+        public ConnectionViewModel(IConnectionOptions connectionOptions, IMediator mediator) : this()
+        {
+            _mediator = Ensure.Any.IsNotNull(mediator, nameof(mediator));
+            _connectionOptions = Ensure.Any.IsNotNull(connectionOptions, nameof(connectionOptions));
+            _selectedEnvironment = _connectionOptions.DefaultEnvironment;
+        }
+
+        [DesignOnly(true)]
+        private ConnectionViewModel()
         {
             DisplayName = "Connection";
             HeaderText = "Connection Settings";
@@ -20,9 +37,24 @@ namespace SOTA.DeviceEmulator.ViewModels
 
         public string HeaderText { get; }
 
-        public bool CanConnect => !string.IsNullOrEmpty(_certificatePath);
+        public bool CanConnect => !string.IsNullOrEmpty(_certificatePath) && !IsLoading;
         public bool CanBrowseFiles => !_isConnected;
 
+        public IReadOnlyCollection<string> Environments => _connectionOptions.Environments;
+
+        public string SelectedEnvironment
+        {
+            get => _selectedEnvironment;
+            set
+            {
+                Set(ref _selectedEnvironment, value, nameof(SelectedEnvironment));
+                NotifyOfPropertyChange(nameof(DeviceProvisioningServiceIdScope));
+            }
+        }
+
+        public string DeviceProvisioningServiceEndpoint => _connectionOptions.DeviceProvisioningServiceEndpoint;
+
+        public string DeviceProvisioningServiceIdScope => _connectionOptions.GetDeviceProvisioningServiceIdScope(SelectedEnvironment);
 
         public bool IsConnected
         {
@@ -32,6 +64,16 @@ namespace SOTA.DeviceEmulator.ViewModels
                 _isConnected = value;
                 NotifyOfPropertyChange(() => IsConnected);
                 NotifyOfPropertyChange(() => CanBrowseFiles);
+            }
+        }
+
+        public bool IsLoading
+        {
+            get => _isLoading;
+            set
+            {
+                Set(ref _isLoading, value, nameof(IsLoading));
+                NotifyOfPropertyChange(nameof(CanConnect));
             }
         }
 
@@ -46,24 +88,37 @@ namespace SOTA.DeviceEmulator.ViewModels
             }
         }
 
+        public string ConnectionError
+        {
+            get => _connectionError;
+            set => Set(ref _connectionError, value, nameof(ConnectionError));
+        }
+
         public async Task Connect()
         {
+            ConnectionError = null;
             try
             {
-                await Task.Delay(1000);
-
-                var networkError = (DateTime.Now.Second % 2) == 1;
-                if (networkError)
-                {
-                    throw new Exception("Network Error!");
-                }
-
+                IsLoading = true;
+                var command = IsConnected
+                    ? (IRequest<ConnectionModel>)new DisconnectCommand()
+                    : new ConnectCommand(
+                        CertificatePath,
+                        DeviceProvisioningServiceEndpoint,
+                        DeviceProvisioningServiceIdScope
+                    );
+                var connection = await _mediator.Send(command);
                 IsConnected = !IsConnected;
-                OnConnectionStatusChanged(new ConnectionStatusChangedEventArgs { IsConnected = IsConnected });
+                var statusChanged = new ConnectionStatusChangedEventArgs(IsConnected, connection.DeviceDisplayName);
+                OnConnectionStatusChanged(statusChanged);
             }
             catch (Exception e)
             {
-                MessageBox.Show(e.Message, "Connection Error");
+                ConnectionError = e.Message;
+            }
+            finally
+            {
+                IsLoading = false;
             }
         }
 
@@ -71,7 +126,7 @@ namespace SOTA.DeviceEmulator.ViewModels
         {
             var dialog = new Microsoft.Win32.OpenFileDialog
             {
-                FileName = "Certificate",
+                FileName = "device.pfx",
                 DefaultExt = ".pfx",
                 Filter = "Personal Information Exchange (.pfx)|*.pfx"
             };
