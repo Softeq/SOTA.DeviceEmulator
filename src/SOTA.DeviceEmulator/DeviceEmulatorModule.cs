@@ -1,14 +1,19 @@
 using System.Collections.ObjectModel;
+using System.Net.Http.Formatting;
 using Autofac;
 using Caliburn.Micro;
 using EnsureThat;
 using GeoAPI.Geometries;
 using MediatR;
 using Microsoft.Extensions.Hosting;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Serialization;
 using Serilog;
 using SOTA.DeviceEmulator.Core;
 using SOTA.DeviceEmulator.Core.Sensors;
 using SOTA.DeviceEmulator.Core.Sensors.TimeFunctions;
+using SOTA.DeviceEmulator.Services;
 using SOTA.DeviceEmulator.Services.Infrastructure.Jobs;
 using SOTA.DeviceEmulator.Services.Infrastructure.Logging;
 using SOTA.DeviceEmulator.Services.Settings;
@@ -76,10 +81,23 @@ namespace SOTA.DeviceEmulator
                 .RegisterAssemblyTypes(ThisAssembly)
                 .AsClosedTypesOf(typeof(INotificationHandler<>))
                 .SingleInstance();
+            builder
+                .RegisterAssemblyTypes(ThisAssembly)
+                .AsClosedTypesOf(typeof(IRequestHandler<,>))
+                .SingleInstance();
 
             builder.RegisterType<ApplicationSettings>()
                    .AsImplementedInterfaces()
                    .SingleInstance();
+            builder.RegisterType<ApplicationContext>()
+                   .As<IApplicationContext>()
+                   .SingleInstance();
+            var jsonSettings = new JsonSerializerSettings
+            {
+                ContractResolver = new CamelCasePropertyNamesContractResolver()
+            };
+            jsonSettings.Converters.Add(new StringEnumConverter { AllowIntegerValues = false });
+            builder.RegisterInstance(jsonSettings);
 
             builder
                 .RegisterAssemblyTypes(typeof(ISensor).Assembly)

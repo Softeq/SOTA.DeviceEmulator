@@ -12,8 +12,13 @@
     <Thickness x:Key="ThicknessSmallLeftRight"
                Left="{StaticResource SpacingSmall}"
                Right="{StaticResource SpacingSmall}" />
+    <Thickness x:Key="ThicknessSmallTopBottom"
+               Top="{StaticResource SpacingSmall}"
+               Bottom="{StaticResource SpacingSmall}" />
     <Thickness x:Key="ThicknessSmallLeft"
                Left="{StaticResource SpacingSmall}"/>
+    <Thickness x:Key="ThicknessSmallRight"
+               Right="{StaticResource SpacingSmall}"/>
     <Thickness x:Key="ThicknessSmallTop"
                Top="{StaticResource SpacingSmall}" />
 
@@ -26,8 +31,13 @@
     <Thickness x:Key="ThicknessMediumLeftRight"
                Left="{StaticResource SpacingSmall}"
                Right="{StaticResource SpacingSmall}" />
+    <Thickness x:Key="ThicknessMediumTopBottom"
+               Top="{StaticResource SpacingMedium}"
+               Bottom="{StaticResource SpacingMedium}" />
     <Thickness x:Key="ThicknessMediumLeft"
                Left="{StaticResource SpacingMedium}"/>
+    <Thickness x:Key="ThicknessMediumRight"
+               Right="{StaticResource SpacingMedium}"/>
     <Thickness x:Key="ThicknessMediumTop"
                Top="{StaticResource SpacingMedium}" />
 
@@ -40,8 +50,13 @@
     <Thickness x:Key="ThicknessLargeLeftRight"
                Left="{StaticResource SpacingSmall}"
                Right="{StaticResource SpacingSmall}" />
+    <Thickness x:Key="ThicknessLargeTopBottom"
+               Top="{StaticResource SpacingLarge}"
+               Bottom="{StaticResource SpacingLarge}" />
     <Thickness x:Key="ThicknessLargeLeft"
                Left="{StaticResource SpacingLarge}"/>
+    <Thickness x:Key="ThicknessLargeRight"
+               Right="{StaticResource SpacingLarge}"/>
     <Thickness x:Key="ThicknessLargeTop"
                Top="{StaticResource SpacingLarge}" />
 

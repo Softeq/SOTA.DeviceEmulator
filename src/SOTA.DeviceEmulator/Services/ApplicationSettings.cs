@@ -21,7 +21,9 @@ namespace SOTA.DeviceEmulator.Services.Settings
             ? Properties.Settings.Default.DefaultEnvironment
             : Environments.FirstOrDefault();
 
-        public string GetIdScope(string environment)
+        public string DeviceProvisioningServiceEndpoint => Properties.Settings.Default.DeviceProvisioningServiceEndpoint;
+
+        public string GetDeviceProvisioningServiceIdScope(string environment)
         {
             Ensure.String.IsNotNullOrEmpty(environment, nameof(environment));
 

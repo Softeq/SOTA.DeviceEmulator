@@ -11,5 +11,8 @@
         Height="720"
         Width="1280"
         d:DataContext="{d:DesignInstance viewModels:ShellViewModel }">
+    <Window.Style>
+        <Style TargetType="Window" BasedOn="{StaticResource {x:Type Window}}"/>
+    </Window.Style>
     <Frame cal:Message.Attach="RegisterFrame($source)" DataContext="{x:Null}" />
 </Window>

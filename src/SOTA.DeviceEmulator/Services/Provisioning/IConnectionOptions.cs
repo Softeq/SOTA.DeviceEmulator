@@ -8,6 +8,8 @@ namespace SOTA.DeviceEmulator.Services.Provisioning
 
         string DefaultEnvironment { get; }
 
-        string GetIdScope(string environment);
+        string DeviceProvisioningServiceEndpoint { get; }
+
+        string GetDeviceProvisioningServiceIdScope(string environment);
     }
 }
