@@ -60,5 +60,31 @@ namespace SOTA.DeviceEmulator.Properties {
                 this["DeviceProvisioningServiceIdScopeMap"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Certificates")]
+        public string CertificatesFolder {
+            get {
+                return ((string)(this["CertificatesFolder"]));
+            }
+            set {
+                this["CertificatesFolder"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<ArrayOfString xmlns:xsi=\"http://www.w3." +
+            "org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">\r\n  <s" +
+            "tring>dev=8B7C5620292D04DB01D55A60EB797F587AFC1620</string>\r\n</ArrayOfString>")]
+        public global::System.Collections.Specialized.StringCollection RootCertificateThumbprintMap {
+            get {
+                return ((global::System.Collections.Specialized.StringCollection)(this["RootCertificateThumbprintMap"]));
+            }
+            set {
+                this["RootCertificateThumbprintMap"] = value;
+            }
+        }
     }
 }

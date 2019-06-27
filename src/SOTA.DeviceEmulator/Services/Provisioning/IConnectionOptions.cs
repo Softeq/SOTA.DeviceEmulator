@@ -10,6 +10,10 @@ namespace SOTA.DeviceEmulator.Services.Provisioning
 
         string DeviceProvisioningServiceEndpoint { get; }
 
+        string CertificatesFolderName { get; }
+
         string GetDeviceProvisioningServiceIdScope(string environment);
+
+        string GetCertificateThumbprint(string environment);
     }
 }
