@@ -4,50 +4,71 @@ using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using System.Threading.Tasks;
+using EnsureThat;
 using MediatR;
+using SOTA.DeviceEmulator.Core;
 
 namespace SOTA.DeviceEmulator.Services.Provisioning
 {
-    public class GenerateCertificateCommandHandler : IRequestHandler<GenerateCertificateCommand, string>
+    public class CreateCertificateCommandHandler : IRequestHandler<CreateCertificateCommand, string>
     {
-        public GenerateCertificateCommandHandler()
-        {
+        private const string CertificatePassword = "sota";
+        private readonly IConnectionOptions _connectionOptions;
+        private readonly IDevice _device;
 
+        public CreateCertificateCommandHandler(IConnectionOptions connectionOptions, IDevice device)
+        {
+            _connectionOptions = Ensure.Any.IsNotNull(connectionOptions, nameof(connectionOptions));
+            _device = Ensure.Any.IsNotNull(device, nameof(device));
         }
 
-        public Task<string> Handle(GenerateCertificateCommand request, CancellationToken cancellationToken)
+        public Task<string> Handle(CreateCertificateCommand request, CancellationToken cancellationToken)
         {
-            var targetFileLocation = Directory.GetCurrentDirectory() + "//MyCert.pfx";
+            string targetFileLocation;
 
             using (var rsa = RSA.Create(2048))
             using (var rootCertificate = GetRootCertificateFromUserStore())
             using (var pureRootCertificate = RemovePrivateKey(rootCertificate))
             using (var newCertificate = CreateCertificate(rsa, rootCertificate))
-            using (var newCertificateWithPrivateKey = newCertificate.CopyWithPrivateKey(rsa))
             {
+                targetFileLocation = Path.Combine(
+                    Directory.GetCurrentDirectory(),
+                    _connectionOptions.CertificatesFolderName,
+                    $"{newCertificate.SubjectName.Name}.pfx");
+
+                Directory.CreateDirectory(Path.GetDirectoryName(targetFileLocation));
+
                 var certificates = new X509Certificate2Collection
                 {
                     pureRootCertificate,
-                    newCertificateWithPrivateKey
+                    newCertificate
                 };
 
-                byte[] certData = certificates.Export(X509ContentType.Pkcs12, "sota");
+                byte[] certData = certificates.Export(X509ContentType.Pkcs12, CertificatePassword);
                 File.WriteAllBytes(targetFileLocation, certData);
             }
 
             return Task.FromResult(targetFileLocation);
         }
 
-        private static X509Certificate2 GetRootCertificateFromUserStore()
+        private X509Certificate2 GetRootCertificateFromUserStore()
         {
             using (var store = new X509Store(StoreName.My, StoreLocation.CurrentUser))
             {
                 store.Open(OpenFlags.ReadOnly);
 
-                var rootCertificate = store.Certificates
-                                           .Find(X509FindType.FindByThumbprint, "8B7C5620292D04DB01D55A60EB797F587AFC1620", false)[0];
+                var certificates = store.Certificates.Find(
+                    X509FindType.FindByThumbprint,
+                    _connectionOptions.RootCertificateThumbprint,
+                    false
+                );
 
-                return rootCertificate;
+                if (certificates.Count == 0)
+                {
+                    throw new FileNotFoundException($"Certificate with thumbprint {_connectionOptions.RootCertificateThumbprint} not found. Please install it to the user store.");
+                }
+
+                return certificates[0];
             }
         }
 
@@ -59,10 +80,10 @@ namespace SOTA.DeviceEmulator.Services.Provisioning
             return pureCertificate;
         }
 
-        private static X509Certificate2 CreateCertificate(RSA rsa, X509Certificate2 issuerCertificate)
+        private X509Certificate2 CreateCertificate(RSA rsa, X509Certificate2 issuerCertificate)
         {
             var certificateRequest = new CertificateRequest(
-                $"CN=TestName-{Guid.NewGuid()}",
+                $"CN={_device.DisplayName}-{Guid.NewGuid()}",
                 rsa,
                 HashAlgorithmName.SHA256,
                 RSASignaturePadding.Pkcs1);
@@ -80,13 +101,16 @@ namespace SOTA.DeviceEmulator.Services.Provisioning
                     },
                     true));
 
-            var certificate = certificateRequest.Create(
+            using (var certificate = certificateRequest.Create(
                 issuerCertificate,
                 DateTimeOffset.UtcNow.AddDays(-1),
                 issuerCertificate.NotAfter,
-                Guid.NewGuid().ToByteArray());
+                Guid.NewGuid().ToByteArray()))
+            {
+                var certificateWithPrivateKey = certificate.CopyWithPrivateKey(rsa);
 
-            return certificate;
+                return certificateWithPrivateKey;
+            }
         }
     }
 }

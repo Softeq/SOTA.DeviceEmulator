@@ -23,6 +23,10 @@ namespace SOTA.DeviceEmulator.Services.Settings
 
         public string DeviceProvisioningServiceEndpoint => Properties.Settings.Default.DeviceProvisioningServiceEndpoint;
 
+        public string CertificatesFolderName => Properties.Settings.Default.CertificatesFolder;
+
+        public string RootCertificateThumbprint => Properties.Settings.Default.RootCertificateThumbprint;
+
         public string GetDeviceProvisioningServiceIdScope(string environment)
         {
             Ensure.String.IsNotNullOrEmpty(environment, nameof(environment));

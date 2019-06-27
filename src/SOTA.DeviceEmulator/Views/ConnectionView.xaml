@@ -63,7 +63,7 @@
                             <Setter Property="Margin" Value="{StaticResource ThicknessSmallLeft}"/>
                         </Style>
                     </DockPanel.Resources>
-                    <Button DockPanel.Dock="Right">Create New</Button>
+                    <Button Name="CreateCertificate"  DockPanel.Dock="Right">Create New</Button>
                     <Button Name="BrowseFiles" DockPanel.Dock="Right">Browse</Button>
                     <TextBox IsReadOnly="True" Text="{Binding CertificatePath}"/>
                 </DockPanel>

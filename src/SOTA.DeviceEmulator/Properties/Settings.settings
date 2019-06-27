@@ -14,5 +14,11 @@
   &lt;string&gt;dev=0ne00064748&lt;/string&gt;
 &lt;/ArrayOfString&gt;</Value>
     </Setting>
+    <Setting Name="CertificatesFolder" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Certificates</Value>
+    </Setting>
+    <Setting Name="RootCertificateThumbprint" Type="System.String" Scope="User">
+      <Value Profile="(Default)">8B7C5620292D04DB01D55A60EB797F587AFC1620</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

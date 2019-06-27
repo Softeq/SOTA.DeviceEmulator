@@ -39,6 +39,7 @@ namespace SOTA.DeviceEmulator.ViewModels
 
         public bool CanConnect => !string.IsNullOrEmpty(_certificatePath) && !IsLoading;
         public bool CanBrowseFiles => !_isConnected;
+        public bool CanCreateCertificate => !_isConnected;
 
         public IReadOnlyCollection<string> Environments => _connectionOptions.Environments;
 
@@ -64,6 +65,7 @@ namespace SOTA.DeviceEmulator.ViewModels
                 _isConnected = value;
                 NotifyOfPropertyChange(() => IsConnected);
                 NotifyOfPropertyChange(() => CanBrowseFiles);
+                NotifyOfPropertyChange(() => CanCreateCertificate);
             }
         }
 
@@ -138,6 +140,22 @@ namespace SOTA.DeviceEmulator.ViewModels
             {
                 CertificatePath = dialog.FileName;
             }
+        }
+
+        public async Task CreateCertificate()
+        {
+            ConnectionError = null;
+            try
+            {
+                var command = new CreateCertificateCommand();
+                var certificatePath = await _mediator.Send(command);
+                CertificatePath = certificatePath;
+            }
+            catch (Exception e)
+            {
+                ConnectionError = e.Message;
+            }
+            
         }
 
         private void OnConnectionStatusChanged(ConnectionStatusChangedEventArgs e)

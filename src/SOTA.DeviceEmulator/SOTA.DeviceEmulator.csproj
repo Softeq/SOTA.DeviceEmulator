@@ -88,8 +88,8 @@
     <Compile Include="Services\Provisioning\ConnectionModel.cs" />
     <Compile Include="Services\Provisioning\DisconnectCommand.cs" />
     <Compile Include="Services\Provisioning\DisconnectCommandHandler.cs" />
-    <Compile Include="Services\Provisioning\GenerateCertificateCommand.cs" />
-    <Compile Include="Services\Provisioning\GenerateCertificateCommandHandler.cs" />
+    <Compile Include="Services\Provisioning\CreateCertificateCommand.cs" />
+    <Compile Include="Services\Provisioning\CreateCertificateCommandHandler.cs" />
     <Compile Include="Services\Provisioning\GetConnectionQuery.cs" />
     <Compile Include="Services\Provisioning\GetConnectionQueryHandler.cs" />
     <Compile Include="Services\Provisioning\IConnectionOptions.cs" />

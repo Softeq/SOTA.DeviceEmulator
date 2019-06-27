@@ -60,5 +60,29 @@ namespace SOTA.DeviceEmulator.Properties {
                 this["DeviceProvisioningServiceIdScopeMap"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Certificates")]
+        public string CertificatesFolder {
+            get {
+                return ((string)(this["CertificatesFolder"]));
+            }
+            set {
+                this["CertificatesFolder"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("8B7C5620292D04DB01D55A60EB797F587AFC1620")]
+        public string RootCertificateThumbprint {
+            get {
+                return ((string)(this["RootCertificateThumbprint"]));
+            }
+            set {
+                this["RootCertificateThumbprint"] = value;
+            }
+        }
     }
 }
