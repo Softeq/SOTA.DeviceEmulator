@@ -16,7 +16,7 @@ namespace SOTA.DeviceEmulator.ViewModels
         private bool _isConnected;
         private string _certificatePath;
         private string _selectedEnvironment;
-        private string _connectionError;
+        private string _errorMessage;
         private bool _isLoading;
 
         public ConnectionViewModel(IConnectionOptions connectionOptions, IMediator mediator) : this()
@@ -90,15 +90,15 @@ namespace SOTA.DeviceEmulator.ViewModels
             }
         }
 
-        public string ConnectionError
+        public string ErrorMessage
         {
-            get => _connectionError;
-            set => Set(ref _connectionError, value, nameof(ConnectionError));
+            get => _errorMessage;
+            set => Set(ref _errorMessage, value, nameof(ErrorMessage));
         }
 
         public async Task Connect()
         {
-            ConnectionError = null;
+            ErrorMessage = null;
             try
             {
                 IsLoading = true;
@@ -116,7 +116,7 @@ namespace SOTA.DeviceEmulator.ViewModels
             }
             catch (Exception e)
             {
-                ConnectionError = e.Message;
+                ErrorMessage = e.Message;
             }
             finally
             {
@@ -144,16 +144,16 @@ namespace SOTA.DeviceEmulator.ViewModels
 
         public async Task CreateCertificate()
         {
-            ConnectionError = null;
+            ErrorMessage = null;
             try
             {
-                var command = new CreateCertificateCommand();
+                var command = new CreateCertificateCommand { Environment = SelectedEnvironment };
                 var certificatePath = await _mediator.Send(command);
                 CertificatePath = certificatePath;
             }
             catch (Exception e)
             {
-                ConnectionError = e.Message;
+                ErrorMessage = e.Message;
             }
             
         }

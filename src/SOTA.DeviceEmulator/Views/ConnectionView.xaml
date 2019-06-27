@@ -72,7 +72,7 @@
         <TextBlock
             Margin="{StaticResource ThicknessMediumTopBottom}"
             VerticalAlignment="Stretch"
-            Text="{Binding ConnectionError, Mode=OneWay}"
+            Text="{Binding ErrorMessage, Mode=OneWay}"
             TextWrapping="Wrap"
             Foreground="{StaticResource {x:Static adonisUi:Brushes.ErrorBrush}}"/>
         <Button Name="Connect"

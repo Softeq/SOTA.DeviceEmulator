@@ -25,14 +25,15 @@ namespace SOTA.DeviceEmulator.Services.Provisioning
         public Task<string> Handle(CreateCertificateCommand request, CancellationToken cancellationToken)
         {
             string targetFileLocation;
+            var certificateThumbprint = _connectionOptions.GetCertificateThumbprint(request.Environment);
 
             using (var rsa = RSA.Create(2048))
-            using (var rootCertificate = GetRootCertificateFromUserStore())
+            using (var rootCertificate = GetRootCertificateFromUserStore(certificateThumbprint))
             using (var pureRootCertificate = RemovePrivateKey(rootCertificate))
             using (var newCertificate = CreateCertificate(rsa, rootCertificate))
             {
                 targetFileLocation = Path.Combine(
-                    Directory.GetCurrentDirectory(),
+                    AppContext.BaseDirectory,
                     _connectionOptions.CertificatesFolderName,
                     $"{newCertificate.SubjectName.Name}.pfx");
 
@@ -51,7 +52,7 @@ namespace SOTA.DeviceEmulator.Services.Provisioning
             return Task.FromResult(targetFileLocation);
         }
 
-        private X509Certificate2 GetRootCertificateFromUserStore()
+        private X509Certificate2 GetRootCertificateFromUserStore(string certificateThumbprint)
         {
             using (var store = new X509Store(StoreName.My, StoreLocation.CurrentUser))
             {
@@ -59,13 +60,13 @@ namespace SOTA.DeviceEmulator.Services.Provisioning
 
                 var certificates = store.Certificates.Find(
                     X509FindType.FindByThumbprint,
-                    _connectionOptions.RootCertificateThumbprint,
+                    certificateThumbprint,
                     false
                 );
 
                 if (certificates.Count == 0)
                 {
-                    throw new FileNotFoundException($"Certificate with thumbprint {_connectionOptions.RootCertificateThumbprint} not found. Please install it to the user store.");
+                    throw new FileNotFoundException($"Certificate with thumbprint {certificateThumbprint} not found. Please install it to the user store.");
                 }
 
                 return certificates[0];

@@ -17,8 +17,11 @@
     <Setting Name="CertificatesFolder" Type="System.String" Scope="User">
       <Value Profile="(Default)">Certificates</Value>
     </Setting>
-    <Setting Name="RootCertificateThumbprint" Type="System.String" Scope="User">
-      <Value Profile="(Default)">8B7C5620292D04DB01D55A60EB797F587AFC1620</Value>
+    <Setting Name="RootCertificateThumbprintMap" Type="System.Collections.Specialized.StringCollection" Scope="User">
+      <Value Profile="(Default)">&lt;?xml version="1.0" encoding="utf-16"?&gt;
+&lt;ArrayOfString xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"&gt;
+  &lt;string&gt;dev=8B7C5620292D04DB01D55A60EB797F587AFC1620&lt;/string&gt;
+&lt;/ArrayOfString&gt;</Value>
     </Setting>
   </Settings>
 </SettingsFile>

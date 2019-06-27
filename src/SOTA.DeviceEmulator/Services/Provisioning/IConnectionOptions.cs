@@ -12,8 +12,8 @@ namespace SOTA.DeviceEmulator.Services.Provisioning
 
         string CertificatesFolderName { get; }
 
-        string RootCertificateThumbprint { get; }
-
         string GetDeviceProvisioningServiceIdScope(string environment);
+
+        string GetCertificateThumbprint(string environment);
     }
 }
