@@ -8,6 +8,6 @@ namespace SOTA.DeviceEmulator.Core
         void Connect(DeviceConnectionMetadata connectionMetadata);
         void Disconnect();
         DeviceMetadata Metadata { get; }
-        DeviceTelemetry ReportTelemetry();
+        DeviceTelemetryReport GetTelemetryReport();
     }
 }

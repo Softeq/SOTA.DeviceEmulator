@@ -25,7 +25,7 @@
             <TextBlock Grid.Column="0"
                        Text="Logs"
                        Style="{StaticResource SubtitleTextBlock}" />
-            <CheckBox Grid.Column="1" Name="AutoScrollCheckbox" IsThreeState="False">Automatically scroll to the latest row.</CheckBox>
+            <CheckBox Grid.Column="1" Name="AutoScrollCheckbox" IsThreeState="False" IsChecked="True">Automatically scroll to the latest row.</CheckBox>
             <Button Grid.Column="3" Name="Clear">Clear</Button>
         </Grid>
         <DataGrid Name="LogsDataGrid"

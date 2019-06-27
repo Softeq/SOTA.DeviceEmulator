@@ -82,6 +82,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Services\ApplicationContext.cs" />
+    <Compile Include="Services\DeviceState.cs" />
     <Compile Include="Services\IApplicationContext.cs" />
     <Compile Include="Services\Provisioning\ConnectCommand.cs" />
     <Compile Include="Services\Provisioning\ConnectCommandHandler.cs" />
@@ -112,7 +113,6 @@
     <Compile Include="Services\Telemetry\TelemetryCollectionRequested.cs" />
     <Compile Include="Services\Telemetry\TelemetryCollectionHandler.cs" />
     <Compile Include="Services\Telemetry\TelemetryCollectionTimerRule.cs" />
-    <Compile Include="Services\Telemetry\TelemetryReportingHandler.cs" />
     <Compile Include="ViewModels\ConnectionStatusChangedEventArgs.cs" />
     <Compile Include="ViewModels\ConnectionViewModel.cs" />
     <Compile Include="ViewModels\ITabViewModel.cs" />

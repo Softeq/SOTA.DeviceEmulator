@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using EnsureThat;
 using SOTA.DeviceEmulator.Core.Sensors;
@@ -9,15 +8,23 @@ namespace SOTA.DeviceEmulator.Core
     public class Device : IDevice
     {
         private readonly object _lock = new object();
+        private readonly IDeviceState _deviceState;
         private readonly List<ISensor> _sensors;
         private readonly IClock _clock;
         private DeviceConnectionMetadata _connectionMetadata;
 
 
-        public Device(IEnumerable<ISensor> sensors, IClock clock)
+        public Device(IDeviceState deviceState, IClock clock)
         {
-            _sensors = Ensure.Any.IsNotNull(sensors, nameof(sensors)).ToList();
+            _deviceState = Ensure.Any.IsNotNull(deviceState, nameof(deviceState));
             _clock = Ensure.Any.IsNotNull(clock, nameof(clock));
+
+            _sensors = new List<ISensor>
+            {
+                new PulseSensor(_deviceState.PulseSensorOptions),
+                new LocationSensor(_deviceState.LocationSensorOptions)
+            };
+
             Metadata = new DeviceMetadata();
         }
 
@@ -61,12 +68,19 @@ namespace SOTA.DeviceEmulator.Core
 
         public DeviceMetadata Metadata { get; }
 
-        public DeviceTelemetry ReportTelemetry()
+        public DeviceTelemetryReport GetTelemetryReport()
         {
             var telemetry = new DeviceTelemetry();
             var time = _clock.UtcNow;
             _sensors.ForEach(sensor => sensor.Report(telemetry, time));
-            return telemetry;
+
+            var report = new DeviceTelemetryReport
+            {
+                Telemetry = telemetry,
+                IsRequiredToSend = _deviceState.IsTransmissionEnabled
+            };
+
+            return report;
         }
     }
 }

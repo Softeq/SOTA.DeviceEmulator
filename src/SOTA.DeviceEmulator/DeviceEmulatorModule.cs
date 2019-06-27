@@ -53,19 +53,9 @@ namespace SOTA.DeviceEmulator
 
             // Please, add registrations from higher architectural levels to lower ones
             builder.RegisterAssemblyTypes(ThisAssembly)
-                .AssignableTo<Screen>()
-                .Where(t => !typeof(ITabViewModel).IsAssignableFrom(t))
-                .AsSelf()
-                .InstancePerDependency();
-            builder.RegisterAssemblyTypes(ThisAssembly)
-                .AssignableTo<ITabViewModel>()
-                .AsSelf()
-                .AsImplementedInterfaces()
-                .SingleInstance();
-            builder.RegisterAssemblyTypes(ThisAssembly)
                 .AssignableTo<PropertyChangedBase>()
                 .AsSelf()
-                .InstancePerDependency();
+                .SingleInstance();
 
             builder
                 .RegisterAssemblyTypes(ThisAssembly)
@@ -99,6 +89,10 @@ namespace SOTA.DeviceEmulator
             jsonSettings.Converters.Add(new StringEnumConverter { AllowIntegerValues = false });
             builder.RegisterInstance(jsonSettings);
 
+            builder
+                .RegisterType<DeviceState>()
+                .As<IDeviceState>()
+                .SingleInstance();
             builder
                 .RegisterAssemblyTypes(typeof(ISensor).Assembly)
                 .AssignableTo<ISensor>()

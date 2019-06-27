@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Caliburn.Micro;
 using EnsureThat;
 using SOTA.DeviceEmulator.Services.Infrastructure.Jobs;
@@ -14,7 +14,7 @@ namespace SOTA.DeviceEmulator.Services.Telemetry
             _eventAggregator = Ensure.Any.IsNotNull(eventAggregator, nameof(eventAggregator));
         }
 
-        public TimeSpan Period => TimeSpan.FromSeconds(5);
+        public TimeSpan Period => TimeSpan.FromSeconds(1);
 
         public void Trigger()
         {
