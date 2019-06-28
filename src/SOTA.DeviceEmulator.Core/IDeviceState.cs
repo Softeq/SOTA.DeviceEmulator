@@ -1,3 +1,4 @@
+using System;
 using SOTA.DeviceEmulator.Core.Sensors;
 
 namespace SOTA.DeviceEmulator.Core
@@ -9,5 +10,9 @@ namespace SOTA.DeviceEmulator.Core
         ILocationSensorOptions LocationSensorOptions { get; }
 
         bool IsTransmissionEnabled { get; set; }
+
+        int TransmissionPeriod { get; set; }
+
+        TimeSpan SessionTime { get; set; }
     }
 }

@@ -1,3 +1,4 @@
+using System;
 using EnsureThat;
 using SOTA.DeviceEmulator.Core;
 using SOTA.DeviceEmulator.Core.Sensors;
@@ -23,6 +24,18 @@ namespace SOTA.DeviceEmulator.Services
         {
             get => _statusBarViewModel.IsTransmissionEnabled;
             set => _statusBarViewModel.IsTransmissionEnabled = value;
+        }
+
+        public int TransmissionPeriod
+        {
+            get => _statusBarViewModel.TransmissionPeriod;
+            set => _statusBarViewModel.TransmissionPeriod = value;
+        }
+
+        public TimeSpan SessionTime
+        {
+            get => _statusBarViewModel.SessionTime;
+            set => _statusBarViewModel.SessionTime = value;
         }
     }
 }

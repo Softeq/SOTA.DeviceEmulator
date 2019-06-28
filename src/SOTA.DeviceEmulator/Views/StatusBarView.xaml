@@ -17,8 +17,6 @@
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="{Binding Source={StaticResource SpacingSmall}}"/>
                     <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="{Binding Source={StaticResource SpacingLarge}}"/>
-                    <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
                 <Ellipse
                     Fill="{Binding IsConnected,
@@ -38,18 +36,13 @@
                     Mode=OneWay,
                     Converter={StaticResource ConnectionStatusBooleanToTextConverter},
                     ConverterParameter='Color'}"/>
-                <CheckBox
-                    Grid.Column="4"
-                    Name="TransmissionEnabledCheckbox"
-                    IsThreeState="False"
-                    IsChecked="{Binding IsTransmissionEnabled}">
-                    Transmission enabled
-                </CheckBox>
             </Grid>
         </StatusBarItem>
         <StatusBarItem HorizontalAlignment="Right">
             <Grid>
                 <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="{Binding Source={StaticResource SpacingLarge}}"/>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="{Binding Source={StaticResource SpacingSmall}}"/>
                     <ColumnDefinition Width="Auto"/>
@@ -58,17 +51,25 @@
                     <ColumnDefinition Width="{Binding Source={StaticResource SpacingSmall}}"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
-                <TextBlock Grid.Column="0" Text="Frequency (s):" VerticalAlignment="Center" />
+                <CheckBox
+                    Grid.Column="0"
+                    Name="TransmissionEnabledCheckbox"
+                    IsThreeState="False"
+                    IsChecked="{Binding IsTransmissionEnabled}"
+                    IsEnabled="{Binding IsConnected}">
+                    Transmission enabled
+                </CheckBox>
+                <TextBlock Grid.Column="2" Text="Frequency (s):" VerticalAlignment="Center" />
                 <toolkit:IntegerUpDown
-                    Grid.Column="2"
+                    Grid.Column="4"
                     FormatString="N1"
                     Value="{Binding TransmissionPeriod}"
                     Increment="1"
                     Minimum="1"
                     Maximum="120"
                     VerticalAlignment="Center"/>
-                <TextBlock Grid.Column="4" Text="Session Time:" VerticalAlignment="Center" />
-                <TextBlock Grid.Column="6" Text="00:00" VerticalAlignment="Center" />
+                <TextBlock Grid.Column="6" Text="Session Time:" VerticalAlignment="Center" />
+                <TextBlock Grid.Column="8" Text="{Binding SessionTime,StringFormat=mm\\:ss}" VerticalAlignment="Center" />
             </Grid>
         </StatusBarItem>
     </StatusBar>
