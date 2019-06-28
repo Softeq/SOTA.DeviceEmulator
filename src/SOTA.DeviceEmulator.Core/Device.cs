@@ -13,6 +13,7 @@ namespace SOTA.DeviceEmulator.Core
         private readonly List<ISensor> _sensors;
         private readonly IClock _clock;
         private DeviceConnectionMetadata _connectionMetadata;
+        private Guid? _sessionId;
         private DateTime? _sessionStartTime;
         private DateTime? _lastTransmissionTime;
 
@@ -23,8 +24,8 @@ namespace SOTA.DeviceEmulator.Core
 
             _sensors = new List<ISensor>
             {
-                new PulseSensor(_deviceState.PulseSensorOptions),
-                new LocationSensor(_deviceState.LocationSensorOptions)
+                new PulseSensor(_deviceState.Pulse),
+                new LocationSensor(_deviceState.Location)
             };
 
             Metadata = new DeviceMetadata();
@@ -70,13 +71,15 @@ namespace SOTA.DeviceEmulator.Core
 
         public DeviceMetadata Metadata { get; }
 
+        public TimeSpan SessionTime { get; private set; }
+
         public DeviceTelemetryReport GetTelemetryReport()
         {
-            var telemetry = new DeviceTelemetry();
             var now = _clock.UtcNow;
+            var telemetry = new DeviceTelemetry { TimeStamp = now };
             _sensors.ForEach(sensor => sensor.Report(telemetry, now));
 
-            UpdateTimes(now);
+            UpdateSessionData(telemetry, now);
 
             var isNeedToTransmit = CheckIfNeedToTransmit(now);
 
@@ -88,27 +91,33 @@ namespace SOTA.DeviceEmulator.Core
             var report = new DeviceTelemetryReport
             {
                 Telemetry = telemetry,
-                IsNeedToTransmit = isNeedToTransmit
+                IsPublished = isNeedToTransmit
             };
 
             return report;
         }
 
-        private void UpdateTimes(DateTime now)
+        private void UpdateSessionData(DeviceTelemetry telemetry, DateTime now)
         {
-            if (_deviceState.IsTransmissionEnabled)
+            if (_deviceState.Transmission.Enabled)
             {
                 if (_sessionStartTime == null)
                 {
+                    _sessionId = Guid.NewGuid();
                     _sessionStartTime = now;
                 }
 
-                _deviceState.SessionTime = now - (DateTime)_sessionStartTime;
+                SessionTime = now - (DateTime)_sessionStartTime;
             }
             else
             {
-                _deviceState.SessionTime = TimeSpan.Zero;
+                SessionTime = TimeSpan.Zero;
                 _sessionStartTime = null;
+            }
+
+            if (_sessionId != null)
+            {
+                telemetry.SessionId = (Guid)_sessionId;
             }
         }
 
@@ -116,8 +125,9 @@ namespace SOTA.DeviceEmulator.Core
         {
             var elapsedSinceLastTransmission = now - ( _lastTransmissionTime ?? DateTime.MinValue );
 
-            return elapsedSinceLastTransmission > TimeSpan.FromSeconds(_deviceState.TransmissionPeriod) &&
-                _deviceState.IsTransmissionEnabled;
+            return elapsedSinceLastTransmission > TimeSpan.FromSeconds(_deviceState.Transmission.Interval) &&
+                _deviceState.Transmission.Enabled &&
+                IsConnected;
         }
     }
 }

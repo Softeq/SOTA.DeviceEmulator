@@ -1,18 +1,13 @@
-using System;
 using SOTA.DeviceEmulator.Core.Sensors;
 
 namespace SOTA.DeviceEmulator.Core
 {
     public interface IDeviceState
     {
-        IPulseSensorOptions PulseSensorOptions { get; }
+        ITransmissionOptions Transmission { get; }
 
-        ILocationSensorOptions LocationSensorOptions { get; }
+        ILocationSensorOptions Location { get; }
 
-        bool IsTransmissionEnabled { get; set; }
-
-        int TransmissionPeriod { get; set; }
-
-        TimeSpan SessionTime { get; set; }
+        IPulseSensorOptions Pulse { get; }
     }
 }

@@ -55,7 +55,7 @@
                     Grid.Column="0"
                     Name="TransmissionEnabledCheckbox"
                     IsThreeState="False"
-                    IsChecked="{Binding IsTransmissionEnabled}"
+                    IsChecked="{Binding Enabled}"
                     IsEnabled="{Binding IsConnected}">
                     Transmission enabled
                 </CheckBox>
@@ -63,12 +63,12 @@
                 <toolkit:IntegerUpDown
                     Grid.Column="4"
                     FormatString="N1"
-                    Value="{Binding TransmissionPeriod}"
+                    Value="{Binding Interval}"
                     Increment="1"
                     Minimum="1"
                     Maximum="120"
                     VerticalAlignment="Center"/>
-                <TextBlock Grid.Column="6" Text="Session Time:" VerticalAlignment="Center" />
+                <TextBlock Grid.Column="6" VerticalAlignment="Center"><Bold>Session Time:</Bold></TextBlock>
                 <TextBlock Grid.Column="8" Text="{Binding SessionTime,StringFormat=mm\\:ss}" VerticalAlignment="Center" />
             </Grid>
         </StatusBarItem>

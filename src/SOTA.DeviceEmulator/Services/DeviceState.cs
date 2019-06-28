@@ -1,4 +1,3 @@
-using System;
 using EnsureThat;
 using SOTA.DeviceEmulator.Core;
 using SOTA.DeviceEmulator.Core.Sensors;
@@ -8,34 +7,17 @@ namespace SOTA.DeviceEmulator.Services
 {
     public class DeviceState : IDeviceState
     {
-        private readonly SensorsViewModel _sensorsViewModel;
-        private readonly StatusBarViewModel _statusBarViewModel;
-
-        public DeviceState(SensorsViewModel sensorsViewModel, StatusBarViewModel statusBarViewModel)
+        public DeviceState(
+            StatusBarViewModel statusBarViewModel,
+            SensorsViewModel sensorsViewModel)
         {
-            _sensorsViewModel = Ensure.Any.IsNotNull(sensorsViewModel, nameof(sensorsViewModel));
-            _statusBarViewModel = Ensure.Any.IsNotNull(statusBarViewModel, nameof(statusBarViewModel));
+            Transmission = Ensure.Any.IsNotNull(statusBarViewModel, nameof(statusBarViewModel));
+            Location = Ensure.Any.IsNotNull(sensorsViewModel, nameof(sensorsViewModel));
+            Pulse = Ensure.Any.IsNotNull(sensorsViewModel, nameof(sensorsViewModel));
         }
 
-        public IPulseSensorOptions PulseSensorOptions => _sensorsViewModel;
-        public ILocationSensorOptions LocationSensorOptions => _sensorsViewModel;
-
-        public bool IsTransmissionEnabled
-        {
-            get => _statusBarViewModel.IsTransmissionEnabled;
-            set => _statusBarViewModel.IsTransmissionEnabled = value;
-        }
-
-        public int TransmissionPeriod
-        {
-            get => _statusBarViewModel.TransmissionPeriod;
-            set => _statusBarViewModel.TransmissionPeriod = value;
-        }
-
-        public TimeSpan SessionTime
-        {
-            get => _statusBarViewModel.SessionTime;
-            set => _statusBarViewModel.SessionTime = value;
-        }
+        public ITransmissionOptions Transmission { get; }
+        public ILocationSensorOptions Location { get; }
+        public IPulseSensorOptions Pulse { get; }
     }
 }

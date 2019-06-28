@@ -4,6 +4,6 @@ namespace SOTA.DeviceEmulator.Core
     {
         public DeviceTelemetry Telemetry { get; set; }
 
-        public bool IsNeedToTransmit { get; set; }
+        public bool IsPublished { get; set; }
     }
 }

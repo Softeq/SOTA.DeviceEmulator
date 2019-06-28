@@ -19,6 +19,8 @@ namespace SOTA.DeviceEmulator.ViewModels
             IMediator mediator
         )
         {
+            Ensure.Any.IsNotNull(connectionViewModel, nameof(connectionViewModel));
+
             _mediator = Ensure.Any.IsNotNull(mediator, nameof(mediator));
             Log = Ensure.Any.IsNotNull(logViewModel, nameof(logViewModel));
             StatusBar = Ensure.Any.IsNotNull(statusBarViewModel, nameof(statusBarViewModel));
@@ -31,7 +33,6 @@ namespace SOTA.DeviceEmulator.ViewModels
             Items.AddRange(tabViewModels);
             StatusBar = statusBarViewModel;
 
-            Ensure.Any.IsNotNull(connectionViewModel, nameof(connectionViewModel));
             connectionViewModel.ConnectionStatusChanged += OnConnectionStatusChanged;
         }
 

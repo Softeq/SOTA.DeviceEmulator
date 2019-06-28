@@ -33,10 +33,10 @@ namespace SOTA.DeviceEmulator.Services.Telemetry
         public async Task Handle(TelemetryCollectionRequested notification, CancellationToken cancellationToken)
         {
             var telemetryReport = _device.GetTelemetryReport();
-            var @event = new TelemetryCollected(telemetryReport.Telemetry);
+            var @event = new TelemetryCollected(telemetryReport.Telemetry, _device.SessionTime);
             await _eventAggregator.PublishOnUIThreadAsync(@event);
 
-            if (telemetryReport.IsNeedToTransmit)
+            if (telemetryReport.IsPublished)
             {
                 _logger.Information("Reporting {@Telemetry}.", telemetryReport.Telemetry);
 

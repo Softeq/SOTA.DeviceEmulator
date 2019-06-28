@@ -1,5 +1,4 @@
 using System.Collections.ObjectModel;
-using System.Net.Http.Formatting;
 using Autofac;
 using Caliburn.Micro;
 using EnsureThat;
@@ -17,7 +16,6 @@ using SOTA.DeviceEmulator.Services;
 using SOTA.DeviceEmulator.Services.Infrastructure.Jobs;
 using SOTA.DeviceEmulator.Services.Infrastructure.Logging;
 using SOTA.DeviceEmulator.Services.Settings;
-using SOTA.DeviceEmulator.ViewModels;
 
 namespace SOTA.DeviceEmulator
 {
@@ -42,7 +40,12 @@ namespace SOTA.DeviceEmulator
 
             builder.RegisterAssemblyTypes(typeof(IMediator).Assembly)
                 .AsImplementedInterfaces();
-            builder.Register(ToggleableMediatorServiceFactory.Create);
+            builder.Register<ServiceFactory>(
+                ctx =>
+                {
+                    var c = ctx.Resolve<IComponentContext>();
+                    return t => c.Resolve(t);
+                });
 
             builder.RegisterType<WindowManager>()
                 .As<IWindowManager>()
