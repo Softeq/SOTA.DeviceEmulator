@@ -1,4 +1,6 @@
 
+using System;
+
 namespace SOTA.DeviceEmulator.Core
 {
     public interface IDevice
@@ -8,6 +10,7 @@ namespace SOTA.DeviceEmulator.Core
         void Connect(DeviceConnectionMetadata connectionMetadata);
         void Disconnect();
         DeviceMetadata Metadata { get; }
-        DeviceTelemetry ReportTelemetry();
+        TimeSpan SessionTime { get; }
+        DeviceTelemetryReport GetTelemetryReport();
     }
 }

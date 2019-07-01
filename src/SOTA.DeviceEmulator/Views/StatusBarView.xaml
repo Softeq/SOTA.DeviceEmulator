@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:toolkit="http://schemas.xceed.com/wpf/xaml/toolkit"
              xmlns:converters1="clr-namespace:SOTA.DeviceEmulator.Views.Converters"
              mc:Ignorable="d"
              d:DesignWidth="800">
@@ -11,7 +12,12 @@
     </UserControl.Resources>
     <StatusBar Height="30" Padding="{StaticResource ThicknessMediumLeftRight}">
         <StatusBarItem>
-            <StackPanel Orientation="Horizontal">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="{Binding Source={StaticResource SpacingSmall}}"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
                 <Ellipse
                     Fill="{Binding IsConnected,
                     Mode=OneWay,
@@ -19,8 +25,9 @@
                     ConverterParameter='Color'}"
                     Height="10"
                     Width="10"
-                    Margin="{StaticResource ThicknessSmallLeftRight}"/>
+                    Grid.Column="0"/>
                 <TextBlock
+                    Grid.Column="2"
                     Text="{Binding IsConnected,
                     Mode=OneWay,
                     Converter={StaticResource ConnectionStatusBooleanToTextConverter},
@@ -29,10 +36,41 @@
                     Mode=OneWay,
                     Converter={StaticResource ConnectionStatusBooleanToTextConverter},
                     ConverterParameter='Color'}"/>
-            </StackPanel>
+            </Grid>
         </StatusBarItem>
         <StatusBarItem HorizontalAlignment="Right">
-            <TextBlock Text="Content on the right" />
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="{Binding Source={StaticResource SpacingLarge}}"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="{Binding Source={StaticResource SpacingSmall}}"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="{Binding Source={StaticResource SpacingLarge}}"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="{Binding Source={StaticResource SpacingSmall}}"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <CheckBox
+                    Grid.Column="0"
+                    Name="TransmissionEnabledCheckbox"
+                    IsThreeState="False"
+                    IsChecked="{Binding Enabled}"
+                    IsEnabled="{Binding IsConnected}">
+                    Transmission enabled
+                </CheckBox>
+                <TextBlock Grid.Column="2" Text="Frequency (s):" VerticalAlignment="Center" />
+                <toolkit:IntegerUpDown
+                    Grid.Column="4"
+                    FormatString="N1"
+                    Value="{Binding Interval}"
+                    Increment="1"
+                    Minimum="1"
+                    Maximum="120"
+                    VerticalAlignment="Center"/>
+                <TextBlock Grid.Column="6" VerticalAlignment="Center"><Bold>Session Time:</Bold></TextBlock>
+                <TextBlock Grid.Column="8" Text="{Binding SessionTime,StringFormat=mm\\:ss}" VerticalAlignment="Center" />
+            </Grid>
         </StatusBarItem>
     </StatusBar>
 </UserControl>

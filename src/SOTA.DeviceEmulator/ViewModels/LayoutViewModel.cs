@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using Caliburn.Micro;
 using EnsureThat;
 using MediatR;
@@ -13,23 +12,26 @@ namespace SOTA.DeviceEmulator.ViewModels
         private string _deviceDisplayName;
 
         public LayoutViewModel(
-            IEnumerable<ITabViewModel> tabs,
             StatusBarViewModel statusBarViewModel,
             LogViewModel logViewModel,
+            ConnectionViewModel connectionViewModel,
+            SensorsViewModel sensorsViewModel,
             IMediator mediator
         )
         {
+            Ensure.Any.IsNotNull(connectionViewModel, nameof(connectionViewModel));
+
             _mediator = Ensure.Any.IsNotNull(mediator, nameof(mediator));
             Log = Ensure.Any.IsNotNull(logViewModel, nameof(logViewModel));
             StatusBar = Ensure.Any.IsNotNull(statusBarViewModel, nameof(statusBarViewModel));
-            Ensure.Any.IsNotNull(tabs, nameof(tabs));
 
-            var tabViewModels = tabs as ITabViewModel[] ?? tabs.ToArray();
+            var tabViewModels = new List<ITabViewModel>
+            {
+                connectionViewModel,
+                sensorsViewModel
+            };
             Items.AddRange(tabViewModels);
             StatusBar = statusBarViewModel;
-
-            var connectionViewModel = tabViewModels.OfType<ConnectionViewModel>().FirstOrDefault();
-            Ensure.Any.IsNotNull(connectionViewModel, nameof(connectionViewModel));
 
             connectionViewModel.ConnectionStatusChanged += OnConnectionStatusChanged;
         }
