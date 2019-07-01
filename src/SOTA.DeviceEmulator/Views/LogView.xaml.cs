@@ -22,12 +22,9 @@ namespace SOTA.DeviceEmulator.Views
         {
             var isScrollCheckboxChecked = AutoScrollCheckbox.IsChecked ?? false;
 
-            if (isScrollCheckboxChecked &&
-                LogsDataGrid.Items.Count > 0 &&
-                VisualTreeHelper.GetChild(LogsDataGrid, 0) is Decorator border &&
-                border.Child is ScrollViewer scroll)
+            if (isScrollCheckboxChecked && LogsDataGrid.Items.Count > 0)
             {
-                 scroll.ScrollToEnd();
+                LogsDataGrid.ScrollIntoView(LogsDataGrid.Items[LogsDataGrid.Items.Count - 1]);
             }
         }
     }
