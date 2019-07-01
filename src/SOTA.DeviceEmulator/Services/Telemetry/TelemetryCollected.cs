@@ -6,13 +6,13 @@ namespace SOTA.DeviceEmulator.Services.Telemetry
 {
     public class TelemetryCollected : INotification
     {
-        public TelemetryCollected(DeviceTelemetry value, TimeSpan sessionTime)
+        public TelemetryCollected(DeviceTelemetry telemetry, TimeSpan sessionTime)
         {
-            Value = value;
+            Telemetry = telemetry;
             SessionTime = sessionTime;
         }
 
-        public DeviceTelemetry Value { get; }
+        public DeviceTelemetry Telemetry { get; }
 
         public TimeSpan SessionTime { get; }
     }

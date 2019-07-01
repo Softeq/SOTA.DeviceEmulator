@@ -66,7 +66,7 @@ namespace SOTA.DeviceEmulator.ViewModels
 
         public void Handle(TelemetryCollected message)
         {
-            Telemetry = message.Value;
+            Telemetry = message.Telemetry;
         }
     }
 }

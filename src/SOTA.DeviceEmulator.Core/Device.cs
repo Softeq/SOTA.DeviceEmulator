@@ -115,10 +115,7 @@ namespace SOTA.DeviceEmulator.Core
                 _sessionStartTime = null;
             }
 
-            if (_sessionId != null)
-            {
-                telemetry.SessionId = (Guid)_sessionId;
-            }
+            telemetry.SessionId = _sessionId ?? Guid.Empty;
         }
 
         private bool CheckIfNeedToTransmit(DateTime now)
