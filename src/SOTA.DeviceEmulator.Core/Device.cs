@@ -75,26 +75,29 @@ namespace SOTA.DeviceEmulator.Core
 
         public DeviceTelemetryReport GetTelemetryReport()
         {
-            var now = _clock.UtcNow;
-            var telemetry = new DeviceTelemetry { TimeStamp = now };
-            _sensors.ForEach(sensor => sensor.Report(telemetry, now));
-
-            UpdateSessionData(telemetry, now);
-
-            var isNeedToTransmit = CheckIfNeedToTransmit(now);
-
-            if (isNeedToTransmit)
+            lock (_lock)
             {
-                _lastTransmissionTime = now;
+                var now = _clock.UtcNow;
+                var telemetry = new DeviceTelemetry { DeviceId = _connectionMetadata?.DeviceId, TimeStamp = now };
+                _sensors.ForEach(sensor => sensor.Report(telemetry, now));
+
+                UpdateSessionData(telemetry, now);
+
+                var isNeedToTransmit = CheckIfNeedToTransmit(now);
+
+                if (isNeedToTransmit)
+                {
+                    _lastTransmissionTime = now;
+                }
+
+                var report = new DeviceTelemetryReport
+                {
+                    Telemetry = telemetry,
+                    IsPublished = isNeedToTransmit
+                };
+
+                return report;
             }
-
-            var report = new DeviceTelemetryReport
-            {
-                Telemetry = telemetry,
-                IsPublished = isNeedToTransmit
-            };
-
-            return report;
         }
 
         private void UpdateSessionData(DeviceTelemetry telemetry, DateTime now)

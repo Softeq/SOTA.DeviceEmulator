@@ -1,10 +1,10 @@
 using System;
-using GeoAPI.Geometries;
 
 namespace SOTA.DeviceEmulator.Core
 {
     public class DeviceTelemetry
     {
+        public string DeviceId { get; internal set; }
         public Guid SessionId { get; internal set; }
         public DateTime TimeStamp { get; set; }
         public int Pulse { get; internal set; }
