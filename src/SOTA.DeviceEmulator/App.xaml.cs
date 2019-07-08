@@ -1,12 +1,8 @@
-﻿using System.Windows;
+using System.Windows;
 
 namespace SOTA.DeviceEmulator
 {
     public partial class App : Application
     {
-        public App()
-        {
-            InitializeComponent();
-        }
     }
 }
