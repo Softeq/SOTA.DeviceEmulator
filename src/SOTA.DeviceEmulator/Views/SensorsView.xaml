@@ -136,7 +136,7 @@
                         Grid.Row="2"
                         Grid.Column="2"
                         FormatString="N1"
-                        Value="{Binding PulseNoiseFactor}"
+                        Value="{Binding NoiseFactor}"
                         Increment="1"
                         Minimum="0"
                         Maximum="30"/>

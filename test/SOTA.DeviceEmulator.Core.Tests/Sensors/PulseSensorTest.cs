@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using FluentAssertions;
 using Moq;
-using SOTA.DeviceEmulator.Core.Sensors;
-using SOTA.DeviceEmulator.Core.Sensors.TimeFunctions;
+using SOTA.DeviceEmulator.Core.Telemetry;
+using SOTA.DeviceEmulator.Core.Telemetry.TimeFunctions;
 using Xunit;
 
 namespace SOTA.DeviceEmulator.Core.Tests.Sensors
@@ -21,8 +21,8 @@ namespace SOTA.DeviceEmulator.Core.Tests.Sensors
             functionMock.Setup(i => i.GetValue(measuringTime)).Returns(ProcedureFunctionResult);
 
             var pulseSensorOptions = new Mock<IPulseSensorOptions>();
-            pulseSensorOptions.Setup(i => i.PulseNoiseFactor).Returns(NoiseFactor);
-            pulseSensorOptions.Setup(i => i.PulseFunction).Returns(functionMock.Object);
+            pulseSensorOptions.Setup(i => i.NoiseFactor).Returns(NoiseFactor);
+            pulseSensorOptions.Setup(i => i.Function).Returns(functionMock.Object);
 
             var pulseSensor = new PulseSensor(pulseSensorOptions.Object);
 

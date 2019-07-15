@@ -1,26 +1,24 @@
 using System;
 using Caliburn.Micro;
 using EnsureThat;
-using SOTA.DeviceEmulator.Core;
+using SOTA.DeviceEmulator.Core.Configuration;
 using SOTA.DeviceEmulator.Services.Telemetry;
 
 namespace SOTA.DeviceEmulator.ViewModels
 {
-    public class StatusBarViewModel : PropertyChangedBase, IHandle<TelemetryCollected>, ITransmissionOptions
+    public class StatusBarViewModel : PropertyChangedBase, IHandle<TelemetryCollected>
     {
-        private bool _isConnected;
-        private bool _isTransmissionEnabled;
         private TimeSpan _sessionTime;
+        private readonly IDeviceConfiguration _deviceConfiguration;
+        private bool _isConnected;
 
-        public StatusBarViewModel(IEventAggregator eventAggregator)
+        public StatusBarViewModel(IEventAggregator eventAggregator, IDeviceConfiguration deviceConfiguration)
         {
+            _deviceConfiguration = Ensure.Any.IsNotNull(deviceConfiguration, nameof(deviceConfiguration));
             Ensure.Any.IsNotNull(eventAggregator, nameof(eventAggregator));
 
             eventAggregator.Subscribe(this);
         }
-
-        // Default period in seconds.
-        private int _transmissionPeriod = 3;
 
         public bool IsConnected
         {
@@ -36,14 +34,22 @@ namespace SOTA.DeviceEmulator.ViewModels
 
         public bool Enabled
         {
-            get => _isTransmissionEnabled;
-            set => Set(ref _isTransmissionEnabled, value, nameof(Enabled));
+            get => _deviceConfiguration.Transmission.Enabled;
+            set
+            {
+                _deviceConfiguration.Transmission.Enabled = value;
+                NotifyOfPropertyChange(nameof(Enabled));
+            }
         }
 
         public int Interval
         {
-            get => _transmissionPeriod;
-            set => Set(ref _transmissionPeriod, value, nameof(Interval));
+            get => _deviceConfiguration.Transmission.Interval;
+            set
+            {
+                _deviceConfiguration.Transmission.Interval = value;
+                NotifyOfPropertyChange(nameof(Interval));
+            }
         }
 
         public void Handle(TelemetryCollected message)

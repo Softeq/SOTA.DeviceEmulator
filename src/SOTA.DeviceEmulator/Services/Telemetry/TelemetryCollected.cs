@@ -1,6 +1,7 @@
 using System;
 using MediatR;
 using SOTA.DeviceEmulator.Core;
+using SOTA.DeviceEmulator.Core.Telemetry;
 
 namespace SOTA.DeviceEmulator.Services.Telemetry
 {

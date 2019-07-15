@@ -1,16 +1,18 @@
-
-using System;
+using FluentValidation.Results;
+using SOTA.DeviceEmulator.Core.Configuration;
+using SOTA.DeviceEmulator.Core.Telemetry;
 
 namespace SOTA.DeviceEmulator.Core
 {
     public interface IDevice
     {
         string DisplayName { get; }
+        IDeviceConfiguration State { get; }
         bool IsConnected { get; }
-        void Connect(DeviceConnectionMetadata connectionMetadata);
+        ValidationResult Connect(DeviceMetadata metadata);
         void Disconnect();
-        DeviceMetadata Metadata { get; }
-        TimeSpan SessionTime { get; }
+        DeviceInformation Information { get; }
         DeviceTelemetryReport GetTelemetryReport();
+        bool TryGetChangedConfiguration(out DeviceConfiguration deviceConfiguration);
     }
 }

@@ -2,8 +2,8 @@ using System;
 using System.Collections.Generic;
 using GeoAPI.Geometries;
 using NetTopologySuite.Algorithm.Distance;
-using SOTA.DeviceEmulator.Core.Sensors;
-using SOTA.DeviceEmulator.Core.Sensors.TimeFunctions;
+using SOTA.DeviceEmulator.Core.Telemetry;
+using SOTA.DeviceEmulator.Core.Telemetry.TimeFunctions;
 using Xunit;
 
 namespace SOTA.DeviceEmulator.Core.Tests.Sensors.TimeFunctions

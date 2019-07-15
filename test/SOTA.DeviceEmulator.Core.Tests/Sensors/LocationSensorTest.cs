@@ -4,8 +4,8 @@ using System.Linq;
 using FluentAssertions;
 using GeoAPI.Geometries;
 using Moq;
-using SOTA.DeviceEmulator.Core.Sensors;
-using SOTA.DeviceEmulator.Core.Sensors.TimeFunctions;
+using SOTA.DeviceEmulator.Core.Telemetry;
+using SOTA.DeviceEmulator.Core.Telemetry.TimeFunctions;
 using Xunit;
 
 namespace SOTA.DeviceEmulator.Core.Tests.Sensors

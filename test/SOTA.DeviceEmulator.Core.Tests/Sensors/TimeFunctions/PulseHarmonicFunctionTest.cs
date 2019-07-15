@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using SOTA.DeviceEmulator.Core.Sensors.TimeFunctions;
+using SOTA.DeviceEmulator.Core.Telemetry.TimeFunctions;
 using Xunit;
 
 namespace SOTA.DeviceEmulator.Core.Tests.Sensors.TimeFunctions

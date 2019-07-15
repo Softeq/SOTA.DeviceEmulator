@@ -1,4 +1,4 @@
-﻿<Page x:Class="SOTA.DeviceEmulator.Views.LayoutView"
+<Page x:Class="SOTA.DeviceEmulator.Views.LayoutView"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -13,11 +13,14 @@
             <RowDefinition />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <TextBlock
-            Style="{StaticResource TitleTextBlock}"
+        <TextBox
             Grid.Row="0"
             Padding="{StaticResource ThicknessMediumAllSides}"
-            Text="{Binding DeviceDisplayName}" />
+            Style="{StaticResource TitleTextBox}"
+            Background="Transparent"
+            BorderThickness="0"
+            Text="{Binding DeviceDisplayName, Mode=OneWay}"
+            IsReadOnly="True"/>
         <Grid Grid.Row="1" Margin="{StaticResource ThicknessMediumLeftRight}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="2*" />

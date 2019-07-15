@@ -1,5 +1,4 @@
-﻿using System;
-using Caliburn.Micro;
+using System;
 
 namespace SOTA.DeviceEmulator.Services.Infrastructure.Jobs
 {
