@@ -2,33 +2,34 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using EnsureThat;
-using SOTA.DeviceEmulator.Core.Sensors;
+using FluentValidation.Results;
+using SOTA.DeviceEmulator.Core.Configuration;
+using SOTA.DeviceEmulator.Core.Telemetry;
+using SOTA.DeviceEmulator.Core.Telemetry.TimeFunctions;
 
 namespace SOTA.DeviceEmulator.Core
 {
     public class Device : IDevice
     {
-        private readonly object _lock = new object();
-        private readonly IDeviceState _deviceState;
-        private readonly List<ISensor> _sensors;
         private readonly IClock _clock;
-        private DeviceConnectionMetadata _connectionMetadata;
-        private Guid? _sessionId;
-        private DateTime? _sessionStartTime;
+        private readonly DeviceState _deviceState;
+        private readonly object _lock = new object();
+        private readonly List<ISensor> _sensors;
         private DateTime? _lastTransmissionTime;
+        private DeviceMetadata _metadata;
 
-        public Device(IDeviceState deviceState, IClock clock)
+        public Device(IClock clock, IEventPublisher eventPublisher, IEnumerable<ITimeFunction<double>> doubleTimeFunctions)
         {
-            _deviceState = Ensure.Any.IsNotNull(deviceState, nameof(deviceState));
+            Ensure.Any.IsNotNull(eventPublisher, nameof(eventPublisher));
+            Ensure.Any.IsNotNull(doubleTimeFunctions, nameof(doubleTimeFunctions));
             _clock = Ensure.Any.IsNotNull(clock, nameof(clock));
-
+            _deviceState = new DeviceState(clock, eventPublisher, doubleTimeFunctions, _lock);
             _sensors = new List<ISensor>
             {
                 new PulseSensor(_deviceState.Pulse),
                 new LocationSensor(_deviceState.Location)
             };
-
-            Metadata = new DeviceMetadata();
+            Information = new DeviceInformation();
         }
 
         public string DisplayName
@@ -37,97 +38,88 @@ namespace SOTA.DeviceEmulator.Core
             {
                 lock (_lock)
                 {
-                    var builder = new StringBuilder(Metadata.UserName);
+                    var builder = new StringBuilder(Information.UserName);
                     builder.Append("-emulator");
-                    if (_connectionMetadata != null)
+                    if (_metadata != null)
                     {
-                        builder.Append($" ({_connectionMetadata.DeviceId})");
+                        builder.Append($" ({_metadata.DeviceId})");
                     }
                     return builder.ToString();
                 }
             }
         }
 
-        public bool IsConnected => _connectionMetadata != null;
+        public IDeviceConfiguration Configuration => _deviceState;
 
-        public void Connect(DeviceConnectionMetadata connectionMetadata)
+        public bool IsConnected => _metadata != null;
+
+        public ValidationResult Connect(DeviceMetadata metadata)
         {
-            Ensure.Any.IsNotNull(connectionMetadata, nameof(connectionMetadata));
+            Ensure.Any.IsNotNull(metadata, nameof(metadata));
 
+            var configuration = metadata.DesiredConfiguration ?? metadata.ReportedConfiguration;
+            var validationResult = configuration != null
+                ? _deviceState.UpdateConfiguration(configuration)
+                : new ValidationResult();
             lock (_lock)
             {
-                _connectionMetadata = connectionMetadata;
+                _metadata = metadata;
             }
-            
+            return validationResult;
         }
 
         public void Disconnect()
         {
             lock (_lock)
             {
-                _connectionMetadata = null;
+                _metadata = null;
             }
         }
 
-        public DeviceMetadata Metadata { get; }
-
-        public TimeSpan SessionTime { get; private set; }
+        public DeviceInformation Information { get; }
 
         public DeviceTelemetryReport GetTelemetryReport()
         {
             lock (_lock)
             {
                 var now = _clock.UtcNow;
-                var telemetry = new DeviceTelemetry { DeviceId = _connectionMetadata?.DeviceId, TimeStamp = now };
+                var telemetry = new DeviceTelemetry(_deviceState.Session.Id, now);
                 _sensors.ForEach(sensor => sensor.Report(telemetry, now));
-
-                UpdateSessionData(telemetry, now);
-
-                var isNeedToTransmit = CheckIfNeedToTransmit(now);
-
-                if (isNeedToTransmit)
-                {
-                    _lastTransmissionTime = now;
-                }
-
-                var report = new DeviceTelemetryReport
-                {
-                    Telemetry = telemetry,
-                    IsPublished = isNeedToTransmit
-                };
-
+                var isPublished = IsPublished(telemetry);
+                var report = new DeviceTelemetryReport(
+                    telemetry,
+                    isPublished,
+                    _deviceState.Session.GetElapsedTime(now)
+                );
                 return report;
             }
         }
 
-        private void UpdateSessionData(DeviceTelemetry telemetry, DateTime now)
+        public bool TryGetChangedConfiguration(out DeviceConfiguration deviceConfiguration)
         {
-            if (_deviceState.Transmission.Enabled)
-            {
-                if (_sessionStartTime == null)
-                {
-                    _sessionId = Guid.NewGuid();
-                    _sessionStartTime = now;
-                }
-
-                SessionTime = now - (DateTime)_sessionStartTime;
-            }
-            else
-            {
-                SessionTime = TimeSpan.Zero;
-                _sessionStartTime = null;
-            }
-
-            telemetry.SessionId = _sessionId ?? Guid.Empty;
+            return _deviceState.TryGetChangedConfiguration(out deviceConfiguration);
         }
 
-        private bool CheckIfNeedToTransmit(DateTime now)
+        private bool IsPublished(DeviceTelemetry telemetry)
         {
-            var elapsedSinceLastTransmission = now - ( _lastTransmissionTime ?? DateTime.MinValue );
+            if (!IsConnected)
+            {
+                return false;
+            }
 
-            return elapsedSinceLastTransmission > TimeSpan.FromSeconds(_deviceState.Transmission.Interval) &&
-                _deviceState.Transmission.Enabled &&
-                IsConnected;
+            if (!_deviceState.Transmission.Enabled)
+            {
+                return false;
+            }
+
+            var elapsedSinceLastTransmission = telemetry.TimeStamp - ( _lastTransmissionTime ?? DateTime.MinValue );
+            var isPublished = elapsedSinceLastTransmission > TimeSpan.FromSeconds(_deviceState.Transmission.Interval);
+            if (isPublished)
+            {
+                _lastTransmissionTime = telemetry.TimeStamp;
+            }
+
+            return isPublished;
         }
     }
 }

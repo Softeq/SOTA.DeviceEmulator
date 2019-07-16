@@ -4,21 +4,21 @@ using System.Linq;
 using EnsureThat;
 using SOTA.DeviceEmulator.Services.Provisioning;
 
-namespace SOTA.DeviceEmulator.Services.Settings
+namespace SOTA.DeviceEmulator.Services
 {
     public class ApplicationSettings : IConnectionOptions
     {
-        private Dictionary<string, string> IdScopePerEnvironment => Properties
-                                                                    .Settings.Default
-                                                                    .DeviceProvisioningServiceIdScopeMap
-                                                                    .Cast<string>()
+        private Dictionary<string, string> IdScopePerEnvironment => Enumerable.Cast<string>(
+                                                                        Properties.Settings.Default
+                                                                                  .DeviceProvisioningServiceIdScopeMap
+                                                                    )
                                                                     .Select(ParseKeyValuePair)
                                                                     .ToDictionary(x => x.Key, x => x.Value);
 
-        private Dictionary<string, string> CertificateThumbprintPerEnvironment => Properties
-                                                                                  .Settings.Default
-                                                                                  .RootCertificateThumbprintMap
-                                                                                  .Cast<string>()
+        private Dictionary<string, string> CertificateThumbprintPerEnvironment => Enumerable.Cast<string>(
+                                                                                      Properties.Settings.Default
+                                                                                                .RootCertificateThumbprintMap
+                                                                                  )
                                                                                   .Select(ParseKeyValuePair)
                                                                                   .ToDictionary(x => x.Key, x => x.Value);
 

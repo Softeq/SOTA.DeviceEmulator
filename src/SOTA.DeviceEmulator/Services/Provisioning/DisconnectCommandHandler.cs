@@ -27,10 +27,10 @@ namespace SOTA.DeviceEmulator.Services.Provisioning
                 return new ConnectionModel(_device.DisplayName, false);
             }
 
+            _device.Disconnect();
             await _applicationContext.DeviceClient.CloseAsync(cancellationToken);
             _applicationContext.DeviceClient.Dispose();
             _applicationContext.DeviceClient = null;
-            _device.Disconnect();
             _logger.Information("Device is disconnected.");
             return new ConnectionModel(_device.DisplayName, false);
         }

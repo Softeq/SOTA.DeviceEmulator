@@ -1,15 +1,18 @@
-﻿using System;
+using System;
 using EnsureThat;
+using Serilog;
 
 namespace SOTA.DeviceEmulator.Services.Infrastructure.Jobs
 {
     internal class NotificationTimer
     {
+        private readonly ILogger _logger;
         private readonly INotificationTimerRule _rule;
         private DateTime? _lastExecutionTime;
 
-        public NotificationTimer(INotificationTimerRule rule)
+        public NotificationTimer(INotificationTimerRule rule, ILogger logger)
         {
+            _logger = Ensure.Any.IsNotNull(logger, nameof(logger));
             _rule = Ensure.Any.IsNotNull(rule, nameof(rule));
         }
 
@@ -24,6 +27,7 @@ namespace SOTA.DeviceEmulator.Services.Infrastructure.Jobs
                 return now - estimatedExecutionTime;
             }
             _rule.Trigger();
+            _logger.Verbose("Timer {TimerName} was triggered.", Name);
             _lastExecutionTime = now;
             return _rule.Period;
         }

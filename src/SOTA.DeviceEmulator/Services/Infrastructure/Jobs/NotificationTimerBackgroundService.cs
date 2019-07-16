@@ -1,8 +1,10 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Threading;
 using EnsureThat;
 using Microsoft.Extensions.Hosting;
 using Serilog;
@@ -25,7 +27,7 @@ namespace SOTA.DeviceEmulator.Services.Infrastructure.Jobs
 
             _logger = logger;
             _clock = clock;
-            _timers = timerRules.Select(rule => new NotificationTimer(rule)).ToList();
+            _timers = timerRules.Select(rule => new NotificationTimer(rule, logger)).ToList();
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)

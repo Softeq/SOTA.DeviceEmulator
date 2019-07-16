@@ -62,7 +62,13 @@
             <DataGrid.Columns>
                 <DataGridTextColumn Binding="{Binding Time, StringFormat='HH:mm:ss.fff'}" Header="Time" />
                 <DataGridTextColumn Binding="{Binding Level}" Header="Level" />
-                <DataGridTextColumn Binding="{Binding Message}" Header="Message" Width="*" />
+                <DataGridTextColumn Binding="{Binding Message}" Header="Message" Width="*">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style>
+                            <Setter Property="TextBlock.TextWrapping" Value="Wrap"/>
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
             </DataGrid.Columns>
         </DataGrid>
     </Grid>
