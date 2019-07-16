@@ -60,7 +60,6 @@ namespace SOTA.DeviceEmulator.Core
                     return validationResult;
                 }
                 _snapshot = configuration.DeepClone();
-                Session.Toggle(_snapshot.Transmission.Enabled);
                 OnConfigurationDownloaded();
                 return validationResult;
             }
@@ -132,7 +131,6 @@ namespace SOTA.DeviceEmulator.Core
                 }
                 var target = GetTarget(memberExpression.Expression);
                 valueProperty.SetValue(target, value, null);
-                Session.Toggle(_snapshot.Transmission.Enabled);
                 OnConfigurationChanged();
             }
         }
@@ -149,11 +147,13 @@ namespace SOTA.DeviceEmulator.Core
 
         private void OnConfigurationChanged()
         {
+            Session.Toggle(_snapshot.Transmission.Enabled);
             _eventPublisher.Publish(new DeviceConfigurationChanged());
         }
 
         private void OnConfigurationDownloaded()
         {
+            Session.Toggle(_snapshot.Transmission.Enabled);
             _eventPublisher.Publish(new DeviceConfigurationDownloaded());
         }
     }
