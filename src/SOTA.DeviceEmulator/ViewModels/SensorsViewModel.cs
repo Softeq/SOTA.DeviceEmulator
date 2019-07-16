@@ -2,15 +2,15 @@ using System.Collections.Generic;
 using System.Linq;
 using Caliburn.Micro;
 using EnsureThat;
-using SOTA.DeviceEmulator.Core;
 using SOTA.DeviceEmulator.Core.Configuration;
 using SOTA.DeviceEmulator.Core.Telemetry;
 using SOTA.DeviceEmulator.Core.Telemetry.TimeFunctions;
+using SOTA.DeviceEmulator.Services;
 using SOTA.DeviceEmulator.Services.Telemetry;
 
 namespace SOTA.DeviceEmulator.ViewModels
 {
-    public sealed class SensorsViewModel : Screen, ITabViewModel, IHandle<TelemetryCollected>
+    public sealed class SensorsViewModel : Screen, ITabViewModel, IHandle<TelemetryCollected>, IHandle<Notification<DeviceConfigurationDownloaded>>
     {
         private readonly IDeviceConfiguration _deviceState;
         private DeviceTelemetry _telemetry;
@@ -82,6 +82,11 @@ namespace SOTA.DeviceEmulator.ViewModels
         public void Handle(TelemetryCollected message)
         {
             Telemetry = message.Telemetry;
+        }
+
+        public void Handle(Notification<DeviceConfigurationDownloaded> message)
+        {
+            NotifyOfPropertyChange();
         }
     }
 }

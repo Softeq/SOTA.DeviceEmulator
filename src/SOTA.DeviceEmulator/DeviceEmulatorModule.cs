@@ -120,7 +120,7 @@ namespace SOTA.DeviceEmulator
                 .As<IDevice>()
                 .SingleInstance();
             builder
-                .Register(ctx => ctx.Resolve<IDevice>().State)
+                .Register(ctx => ctx.Resolve<IDevice>().Configuration)
                 .As<IDeviceConfiguration>()
                 .InstancePerDependency();
             builder

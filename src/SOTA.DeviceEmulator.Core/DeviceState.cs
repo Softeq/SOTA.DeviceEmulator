@@ -61,7 +61,7 @@ namespace SOTA.DeviceEmulator.Core
                 }
                 _snapshot = configuration.DeepClone();
                 Session.Toggle(_snapshot.Transmission.Enabled);
-                OnConfigurationChanged();
+                OnConfigurationDownloaded();
                 return validationResult;
             }
         }
@@ -150,6 +150,11 @@ namespace SOTA.DeviceEmulator.Core
         private void OnConfigurationChanged()
         {
             _eventPublisher.Publish(new DeviceConfigurationChanged());
+        }
+
+        private void OnConfigurationDownloaded()
+        {
+            _eventPublisher.Publish(new DeviceConfigurationDownloaded());
         }
     }
 }

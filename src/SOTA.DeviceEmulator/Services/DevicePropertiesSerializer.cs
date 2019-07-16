@@ -36,6 +36,13 @@ namespace SOTA.DeviceEmulator.Services
             }
         }
 
+        public TwinCollection Serialize(DeviceProperties deviceProperties)
+        {
+            Ensure.Any.IsNotNull(deviceProperties, nameof(deviceProperties));
+
+            return _twinCollectionSerializer.Serialize(deviceProperties);
+        }
+
         public DeviceProperties Deserialize(TwinCollection twinCollection)
         {
             Ensure.Any.IsNotNull(twinCollection, nameof(twinCollection));
@@ -48,13 +55,6 @@ namespace SOTA.DeviceEmulator.Services
             Ensure.Any.IsNotNull(deviceConfiguration, nameof(deviceConfiguration));
 
             return SerializeSection(nameof(DeviceProperties.Configuration), deviceConfiguration);
-        }
-
-        public TwinCollection SerializeToDeviceProperties(DeviceInformation deviceInformation)
-        {
-            Ensure.Any.IsNotNull(deviceInformation, nameof(deviceInformation));
-
-            return SerializeSection(nameof(DeviceProperties.Information), deviceInformation);
         }
 
         public ProvisioningRegistrationAdditionalData SerializeToRegistrationData(DeviceInformation information)

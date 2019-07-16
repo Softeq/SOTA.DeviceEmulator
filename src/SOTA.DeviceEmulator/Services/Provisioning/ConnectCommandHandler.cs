@@ -87,20 +87,7 @@ namespace SOTA.DeviceEmulator.Services.Provisioning
                     _logger.Debug("Initial device twin received: {@DeviceTwin}.", twin);
                     var reportedProperties = _devicePropertiesSerializer.Deserialize(twin.Properties.Reported);
                     var desiredProperties = _devicePropertiesSerializer.Deserialize(twin.Properties.Desired);
-                    if (!EqualityComparer<DeviceInformation>.Default.Equals(
-                        reportedProperties.Information,
-                        _device.Information
-                    ))
-                    {
-                        var twinProperties =
-                            _devicePropertiesSerializer.SerializeToDeviceProperties(_device.Information);
-                        await deviceClient.UpdateReportedPropertiesAsync(twinProperties, cancellationToken);
-                        _logger.Information(
-                            "Device information was reported: {@DeviceInformation}.",
-                            _device.Information
-                        );
-                    }
-
+                    
                     var metadata = new DeviceMetadata(
                         registrationResult.DeviceId,
                         registrationResult.RegistrationId,
@@ -109,6 +96,21 @@ namespace SOTA.DeviceEmulator.Services.Provisioning
                     );
                     var validationResult = _device.Connect(metadata);
                     _logger.Information("Device is connected.");
+                    _device.TryGetChangedConfiguration(out var actualConfiguration);
+                    var actualProperties = new DeviceProperties(_device.Information, actualConfiguration);
+                    if (!EqualityComparer<DeviceProperties>.Default.Equals(
+                        reportedProperties,
+                        actualProperties
+                    ))
+                    {
+                        var twinProperties =
+                            _devicePropertiesSerializer.Serialize(actualProperties);
+                        await deviceClient.UpdateReportedPropertiesAsync(twinProperties, cancellationToken);
+                        _logger.Information(
+                            "Device properties were reported: {@DeviceProperties}.",
+                            actualProperties
+                        );
+                    }
                     if (!validationResult.IsValid)
                     {
                         var errors = string.Join(

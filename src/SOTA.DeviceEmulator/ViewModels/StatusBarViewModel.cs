@@ -2,11 +2,12 @@ using System;
 using Caliburn.Micro;
 using EnsureThat;
 using SOTA.DeviceEmulator.Core.Configuration;
+using SOTA.DeviceEmulator.Services;
 using SOTA.DeviceEmulator.Services.Telemetry;
 
 namespace SOTA.DeviceEmulator.ViewModels
 {
-    public class StatusBarViewModel : PropertyChangedBase, IHandle<TelemetryCollected>
+    public class StatusBarViewModel : PropertyChangedBase, IHandle<TelemetryCollected>, IHandle<Notification<DeviceConfigurationDownloaded>>
     {
         private TimeSpan _sessionTime;
         private readonly IDeviceConfiguration _deviceConfiguration;
@@ -55,6 +56,12 @@ namespace SOTA.DeviceEmulator.ViewModels
         public void Handle(TelemetryCollected message)
         {
             SessionTime = message.SessionTime;
+        }
+
+        public void Handle(Notification<DeviceConfigurationDownloaded> message)
+        {
+            NotifyOfPropertyChange(nameof(Enabled));
+            NotifyOfPropertyChange(nameof(Interval));
         }
     }
 }

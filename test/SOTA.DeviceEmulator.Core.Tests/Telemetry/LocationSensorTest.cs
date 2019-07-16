@@ -8,7 +8,7 @@ using SOTA.DeviceEmulator.Core.Telemetry;
 using SOTA.DeviceEmulator.Core.Telemetry.TimeFunctions;
 using Xunit;
 
-namespace SOTA.DeviceEmulator.Core.Tests.Sensors
+namespace SOTA.DeviceEmulator.Core.Tests.Telemetry
 {
     public class LocationSensorTest
     {

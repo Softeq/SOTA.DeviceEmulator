@@ -49,7 +49,7 @@ namespace SOTA.DeviceEmulator.Core
             }
         }
 
-        public IDeviceConfiguration State => _deviceState;
+        public IDeviceConfiguration Configuration => _deviceState;
 
         public bool IsConnected => _metadata != null;
 

@@ -7,7 +7,7 @@ namespace SOTA.DeviceEmulator.Core
     public interface IDevice
     {
         string DisplayName { get; }
-        IDeviceConfiguration State { get; }
+        IDeviceConfiguration Configuration { get; }
         bool IsConnected { get; }
         ValidationResult Connect(DeviceMetadata metadata);
         void Disconnect();

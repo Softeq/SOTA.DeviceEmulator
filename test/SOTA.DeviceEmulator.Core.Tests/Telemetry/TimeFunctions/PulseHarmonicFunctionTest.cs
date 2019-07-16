@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using SOTA.DeviceEmulator.Core.Telemetry.TimeFunctions;
 using Xunit;
 
-namespace SOTA.DeviceEmulator.Core.Tests.Sensors.TimeFunctions
+namespace SOTA.DeviceEmulator.Core.Tests.Telemetry.TimeFunctions
 {
     public class PulseHarmonicFunctionTest
     {

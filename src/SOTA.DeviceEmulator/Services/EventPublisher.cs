@@ -33,7 +33,7 @@ namespace SOTA.DeviceEmulator.Services
                     Debounce(configurationChanged, TimeSpan.FromSeconds(5), PublishOnBackgroundThread);
                     break;
                 default:
-                    PublishOnBackgroundThread(@event);
+                    PublishOnUIThread(@event);
                     break;
             }
         }
@@ -66,11 +66,24 @@ namespace SOTA.DeviceEmulator.Services
 
         private void PublishOnBackgroundThread<T>(T @event) where T : class
         {
+            var notification = Wrap(@event);
+            _eventAggregator.PublishOnBackgroundThread(notification);
+            _logger.Debug("Published event {@Event} as notification on background thread.", @event);
+        }
+
+        private void PublishOnUIThread<T>(T @event) where T : class
+        {
+            var notification = Wrap(@event);
+            _eventAggregator.PublishOnUIThread(notification);
+            _logger.Debug("Published event {@Event} as notification on UI thread.", @event);
+        }
+
+        private static INotification Wrap<T>(T @event) where T : class
+        {
             var notification = @event is INotification notificationEvent
                 ? notificationEvent
                 : new Notification<T>(@event);
-            _eventAggregator.PublishOnBackgroundThread(notification);
-            _logger.Debug("Published notification {@Notification} on background thread.", notification);
+            return notification;
         }
     }
 }
