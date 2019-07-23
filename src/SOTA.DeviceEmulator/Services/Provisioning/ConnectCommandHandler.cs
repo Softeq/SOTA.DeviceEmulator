@@ -4,6 +4,7 @@ using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using System.Threading.Tasks;
+using Caliburn.Micro;
 using EnsureThat;
 using MediatR;
 using Microsoft.Azure.Devices.Client;
@@ -12,6 +13,8 @@ using Microsoft.Azure.Devices.Provisioning.Client.Transport;
 using Microsoft.Azure.Devices.Shared;
 using Serilog;
 using SOTA.DeviceEmulator.Core;
+using SOTA.DeviceEmulator.Services.Configuration;
+using SOTA.DeviceEmulator.Services.Infrastructure.Logging;
 
 namespace SOTA.DeviceEmulator.Services.Provisioning
 {
@@ -23,13 +26,15 @@ namespace SOTA.DeviceEmulator.Services.Provisioning
         private readonly IDevice _device;
         private readonly ILogger _logger;
         private readonly IMediator _mediator;
+        private readonly IEventPublisher _eventPublisher;
 
         public ConnectCommandHandler(
             IDevice device,
             IDevicePropertiesSerializer devicePropertiesSerializer,
             ILogger logger,
             IMediator mediator,
-            IApplicationContext applicationContext
+            IApplicationContext applicationContext,
+            IEventPublisher eventPublisher
         )
         {
             _devicePropertiesSerializer = Ensure.Any.IsNotNull(
@@ -40,6 +45,7 @@ namespace SOTA.DeviceEmulator.Services.Provisioning
             _applicationContext = Ensure.Any.IsNotNull(applicationContext, nameof(applicationContext));
             _logger = Ensure.Any.IsNotNull(logger, nameof(logger)).ForContext(GetType());
             _device = Ensure.Any.IsNotNull(device, nameof(device));
+            _eventPublisher = Ensure.Any.IsNotNull(eventPublisher, nameof(eventPublisher));
         }
 
         public async Task<ConnectionModel> Handle(ConnectCommand request, CancellationToken cancellationToken)
@@ -83,6 +89,9 @@ namespace SOTA.DeviceEmulator.Services.Provisioning
                     _logger.Information("Device client connection is open.");
                     await _mediator.Send(new DisconnectCommand(), cancellationToken);
                     _applicationContext.DeviceClient = deviceClient;
+
+                    await deviceClient.SetDesiredPropertyUpdateCallbackAsync(OnDesiredPropertyChange, null, cancellationToken);
+
                     var twin = await deviceClient.GetTwinAsync(cancellationToken);
                     _logger.Debug("Initial device twin received: {@DeviceTwin}.", twin);
                     var reportedProperties = _devicePropertiesSerializer.Deserialize(twin.Properties.Reported);
@@ -111,14 +120,9 @@ namespace SOTA.DeviceEmulator.Services.Provisioning
                             actualProperties
                         );
                     }
-                    if (!validationResult.IsValid)
-                    {
-                        var errors = string.Join(
-                            Environment.NewLine,
-                            validationResult.Errors.Select(x => x.ErrorMessage).Select(x => $"- {x}")
-                        );
-                        _logger.Warning($"Invalid device configuration provided:{Environment.NewLine}{errors}");
-                    }
+
+                    _logger.LogValidationErrorsIfAny("Invalid device configuration provided", validationResult);
+
                     return new ConnectionModel(_device.DisplayName, _device.IsConnected);
                 }
             }
@@ -146,6 +150,18 @@ namespace SOTA.DeviceEmulator.Services.Provisioning
                     }
                 }
             }
+        }
+
+        private Task OnDesiredPropertyChange(TwinCollection twinCollection, object userContext)
+        {
+            var updateConfigurationEvent = new DeviceConfigurationRemotelyUpdated
+            {
+                TwinCollection = twinCollection
+            };
+
+            _eventPublisher.Publish(updateConfigurationEvent);
+
+            return Task.CompletedTask;
         }
     }
 }

@@ -60,9 +60,11 @@ namespace SOTA.DeviceEmulator.Core
                     return validationResult;
                 }
                 _snapshot = configuration.DeepClone();
-                OnConfigurationDownloaded();
-                return validationResult;
             }
+
+            OnConfigurationDownloaded();
+
+            return validationResult;
         }
 
         public bool TryGetChangedConfiguration(out DeviceConfiguration deviceConfiguration)

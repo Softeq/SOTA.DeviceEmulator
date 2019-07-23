@@ -6,12 +6,13 @@ namespace SOTA.DeviceEmulator.Core
 {
     public interface IDevice
     {
+        DeviceInformation Information { get; }
         string DisplayName { get; }
         IDeviceConfiguration Configuration { get; }
         bool IsConnected { get; }
         ValidationResult Connect(DeviceMetadata metadata);
         void Disconnect();
-        DeviceInformation Information { get; }
+        ValidationResult UpdateConfiguration(DeviceConfiguration configuration);
         DeviceTelemetryReport GetTelemetryReport();
         bool TryGetChangedConfiguration(out DeviceConfiguration deviceConfiguration);
     }

@@ -89,6 +89,8 @@
     </ApplicationDefinition>
     <Compile Include="Services\ApplicationContext.cs" />
     <Compile Include="Services\Configuration\ConfigurationChangedHandler.cs" />
+    <Compile Include="Services\Configuration\DeviceConfigurationRemotelyUpdated.cs" />
+    <Compile Include="Services\Configuration\ConfigurationRemotelyUpdatedHandler.cs" />
     <Compile Include="Services\DevicePropertiesSerializer.cs" />
     <Compile Include="Services\DeviceProperties.cs" />
     <Compile Include="Services\Configuration\IDeviceConfigurationSerializer.cs" />
@@ -140,6 +142,7 @@
       <DependentUpon>ConnectionView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Converters\LatLongToStringConverter.cs" />
+    <Compile Include="Views\Converters\XceedDoubleValueFixConverter.cs" />
     <Compile Include="Views\LayoutView.xaml.cs">
       <DependentUpon>LayoutView.xaml</DependentUpon>
     </Compile>

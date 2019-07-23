@@ -7,6 +7,7 @@ using MediatR;
 using Serilog;
 using SOTA.DeviceEmulator.Core;
 using SOTA.DeviceEmulator.Core.Configuration;
+using SOTA.DeviceEmulator.Services.Configuration;
 
 namespace SOTA.DeviceEmulator.Services
 {
@@ -31,6 +32,9 @@ namespace SOTA.DeviceEmulator.Services
             {
                 case DeviceConfigurationChanged configurationChanged:
                     Debounce(configurationChanged, TimeSpan.FromSeconds(5), PublishOnBackgroundThread);
+                    break;
+                case DeviceConfigurationRemotelyUpdated configurationUpdated:
+                    PublishOnBackgroundThread(configurationUpdated);
                     break;
                 default:
                     PublishOnUIThread(@event);
