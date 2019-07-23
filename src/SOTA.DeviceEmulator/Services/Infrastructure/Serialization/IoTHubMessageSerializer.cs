@@ -20,10 +20,14 @@ namespace SOTA.DeviceEmulator.Services.Infrastructure.Serialization
             var ms = new MemoryStream();
             try
             {
-                using (var writer = new StreamWriter(ms, Encoding.UTF8, bufferSize: 4096, leaveOpen: true))
+                using (var writer = new StreamWriter(ms, new UTF8Encoding(false), bufferSize: 4096, leaveOpen: true))
                 {
                     _jsonSerializer.Serialize(writer, value);
                 }
+
+                ms.Flush();
+                ms.Seek(0, SeekOrigin.Begin);
+
                 return new Message(ms);
             }
             catch (Exception)

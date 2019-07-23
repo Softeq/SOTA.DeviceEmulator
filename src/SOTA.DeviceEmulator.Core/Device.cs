@@ -32,6 +32,8 @@ namespace SOTA.DeviceEmulator.Core
             Information = new DeviceInformation();
         }
 
+        public DeviceInformation Information { get; }
+
         public string DisplayName
         {
             get
@@ -68,6 +70,14 @@ namespace SOTA.DeviceEmulator.Core
             return validationResult;
         }
 
+        public ValidationResult UpdateConfiguration(DeviceConfiguration configuration)
+        {
+            Ensure.Any.IsNotNull(configuration, nameof(configuration));
+
+            var validationResult = _deviceState.UpdateConfiguration(configuration);
+            return validationResult;
+        }
+
         public void Disconnect()
         {
             lock (_lock)
@@ -75,8 +85,6 @@ namespace SOTA.DeviceEmulator.Core
                 _metadata = null;
             }
         }
-
-        public DeviceInformation Information { get; }
 
         public DeviceTelemetryReport GetTelemetryReport()
         {

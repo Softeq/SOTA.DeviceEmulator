@@ -5,6 +5,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using System.Threading.Tasks;
 using EnsureThat;
+using FluentValidation.Results;
 using MediatR;
 using Microsoft.Azure.Devices.Client;
 using Microsoft.Azure.Devices.Provisioning.Client;
@@ -12,6 +13,9 @@ using Microsoft.Azure.Devices.Provisioning.Client.Transport;
 using Microsoft.Azure.Devices.Shared;
 using Serilog;
 using SOTA.DeviceEmulator.Core;
+using SOTA.DeviceEmulator.Services.Configuration;
+using SOTA.DeviceEmulator.Services.Infrastructure.Logging;
+using Xceed.Wpf.Toolkit.Core.Input;
 
 namespace SOTA.DeviceEmulator.Services.Provisioning
 {
@@ -83,6 +87,9 @@ namespace SOTA.DeviceEmulator.Services.Provisioning
                     _logger.Information("Device client connection is open.");
                     await _mediator.Send(new DisconnectCommand(), cancellationToken);
                     _applicationContext.DeviceClient = deviceClient;
+
+                    await deviceClient.SetDesiredPropertyUpdateCallbackAsync(OnDesiredPropertyChange, null, cancellationToken);
+
                     var twin = await deviceClient.GetTwinAsync(cancellationToken);
                     _logger.Debug("Initial device twin received: {@DeviceTwin}.", twin);
                     var reportedProperties = _devicePropertiesSerializer.Deserialize(twin.Properties.Reported);
@@ -111,14 +118,12 @@ namespace SOTA.DeviceEmulator.Services.Provisioning
                             actualProperties
                         );
                     }
+
                     if (!validationResult.IsValid)
                     {
-                        var errors = string.Join(
-                            Environment.NewLine,
-                            validationResult.Errors.Select(x => x.ErrorMessage).Select(x => $"- {x}")
-                        );
-                        _logger.Warning($"Invalid device configuration provided:{Environment.NewLine}{errors}");
+                        _logger.LogValidationErrors(validationResult);
                     }
+
                     return new ConnectionModel(_device.DisplayName, _device.IsConnected);
                 }
             }
@@ -146,6 +151,18 @@ namespace SOTA.DeviceEmulator.Services.Provisioning
                     }
                 }
             }
+        }
+
+        private Task OnDesiredPropertyChange(TwinCollection twinCollection, object userContext)
+        {
+            var updateCommand = new UpdateDeviceConfigurationCommand
+            {
+                TwinCollection = twinCollection
+            };
+
+            var result = _mediator.Send(updateCommand);
+
+            return result;
         }
     }
 }
