@@ -154,7 +154,7 @@ namespace SOTA.DeviceEmulator.Services.Provisioning
 
         private Task OnDesiredPropertyChange(TwinCollection twinCollection, object userContext)
         {
-            var updateConfigurationEvent = new DeviceConfigurationUpdated
+            var updateConfigurationEvent = new DeviceConfigurationRemotelyUpdated
             {
                 TwinCollection = twinCollection
             };

@@ -33,7 +33,7 @@ namespace SOTA.DeviceEmulator.Services
                 case DeviceConfigurationChanged configurationChanged:
                     Debounce(configurationChanged, TimeSpan.FromSeconds(5), PublishOnBackgroundThread);
                     break;
-                case DeviceConfigurationUpdated configurationUpdated:
+                case DeviceConfigurationRemotelyUpdated configurationUpdated:
                     PublishOnBackgroundThread(configurationUpdated);
                     break;
                 default:

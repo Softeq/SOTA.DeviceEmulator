@@ -8,13 +8,13 @@ using SOTA.DeviceEmulator.Services.Infrastructure.Logging;
 
 namespace SOTA.DeviceEmulator.Services.Configuration
 {
-    internal class ConfigurationUpdatedHandler : INotificationHandler<Notification<DeviceConfigurationUpdated>>
+    internal class ConfigurationRemotelyUpdatedHandler : INotificationHandler<Notification<DeviceConfigurationRemotelyUpdated>>
     {
         private readonly IDevicePropertiesSerializer _devicePropertiesSerializer;
         private readonly IDevice _device;
         private readonly ILogger _logger;
 
-        public ConfigurationUpdatedHandler(
+        public ConfigurationRemotelyUpdatedHandler(
             IDevicePropertiesSerializer devicePropertiesSerializer,
             IDevice device,
             ILogger logger
@@ -29,27 +29,7 @@ namespace SOTA.DeviceEmulator.Services.Configuration
             _logger = Ensure.Any.IsNotNull(logger, nameof(logger)).ForContext(GetType());
         }
 
-        public Task<Unit> Handle(DeviceConfigurationUpdated request, CancellationToken cancellationToken)
-        {
-            Ensure.Any.IsNotNull(request.TwinCollection);
-
-            var properties = _devicePropertiesSerializer.Deserialize(request.TwinCollection);
-            var updateConfigValidationResult = _device.UpdateConfiguration(properties.Configuration);
-
-            _logger.LogValidationErrorsIfAny("Invalid device configuration provided", updateConfigValidationResult);
-
-            if (updateConfigValidationResult.IsValid)
-            {
-                _logger.Information(
-                    "Device properties were updated: {@DeviceProperties}.",
-                    properties
-                );
-            }
-
-            return Task.FromResult(Unit.Value);
-        }
-
-        public Task Handle(Notification<DeviceConfigurationUpdated> notification, CancellationToken cancellationToken)
+        public Task Handle(Notification<DeviceConfigurationRemotelyUpdated> notification, CancellationToken cancellationToken)
         {
             Ensure.Any.IsNotNull(notification.Event.TwinCollection);
 
