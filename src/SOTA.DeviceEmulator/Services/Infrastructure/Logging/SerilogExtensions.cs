@@ -22,14 +22,19 @@ namespace SOTA.DeviceEmulator.Services.Infrastructure.Logging
                    .WriteTo.Sink(sink);
         }
 
-        public static void LogValidationErrors(this ILogger logger, ValidationResult validationResult)
+        public static void LogValidationErrorsIfAny(this ILogger logger, string messagePrefix, ValidationResult validationResult)
         {
+            if (validationResult.IsValid)
+            {
+                return;
+            }
+
             var errors = string.Join(
                 Environment.NewLine,
                 validationResult.Errors.Select(x => x.ErrorMessage).Select(x => $"- {x}")
             );
 
-            logger.Warning($"Invalid device configuration provided:{Environment.NewLine}{errors}");
+            logger.Warning($"{messagePrefix}:{Environment.NewLine}{errors}");
         }
     }
 }

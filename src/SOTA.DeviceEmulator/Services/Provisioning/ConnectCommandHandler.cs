@@ -4,8 +4,8 @@ using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using System.Threading.Tasks;
+using Caliburn.Micro;
 using EnsureThat;
-using FluentValidation.Results;
 using MediatR;
 using Microsoft.Azure.Devices.Client;
 using Microsoft.Azure.Devices.Provisioning.Client;
@@ -15,7 +15,6 @@ using Serilog;
 using SOTA.DeviceEmulator.Core;
 using SOTA.DeviceEmulator.Services.Configuration;
 using SOTA.DeviceEmulator.Services.Infrastructure.Logging;
-using Xceed.Wpf.Toolkit.Core.Input;
 
 namespace SOTA.DeviceEmulator.Services.Provisioning
 {
@@ -27,13 +26,15 @@ namespace SOTA.DeviceEmulator.Services.Provisioning
         private readonly IDevice _device;
         private readonly ILogger _logger;
         private readonly IMediator _mediator;
+        private readonly IEventPublisher _eventPublisher;
 
         public ConnectCommandHandler(
             IDevice device,
             IDevicePropertiesSerializer devicePropertiesSerializer,
             ILogger logger,
             IMediator mediator,
-            IApplicationContext applicationContext
+            IApplicationContext applicationContext,
+            IEventPublisher eventPublisher
         )
         {
             _devicePropertiesSerializer = Ensure.Any.IsNotNull(
@@ -44,6 +45,7 @@ namespace SOTA.DeviceEmulator.Services.Provisioning
             _applicationContext = Ensure.Any.IsNotNull(applicationContext, nameof(applicationContext));
             _logger = Ensure.Any.IsNotNull(logger, nameof(logger)).ForContext(GetType());
             _device = Ensure.Any.IsNotNull(device, nameof(device));
+            _eventPublisher = Ensure.Any.IsNotNull(eventPublisher, nameof(eventPublisher));
         }
 
         public async Task<ConnectionModel> Handle(ConnectCommand request, CancellationToken cancellationToken)
@@ -119,10 +121,7 @@ namespace SOTA.DeviceEmulator.Services.Provisioning
                         );
                     }
 
-                    if (!validationResult.IsValid)
-                    {
-                        _logger.LogValidationErrors(validationResult);
-                    }
+                    _logger.LogValidationErrorsIfAny("Invalid device configuration provided", validationResult);
 
                     return new ConnectionModel(_device.DisplayName, _device.IsConnected);
                 }
@@ -155,14 +154,14 @@ namespace SOTA.DeviceEmulator.Services.Provisioning
 
         private Task OnDesiredPropertyChange(TwinCollection twinCollection, object userContext)
         {
-            var updateCommand = new UpdateDeviceConfigurationCommand
+            var updateConfigurationEvent = new DeviceConfigurationUpdated
             {
                 TwinCollection = twinCollection
             };
 
-            var result = _mediator.Send(updateCommand);
+            _eventPublisher.Publish(updateConfigurationEvent);
 
-            return result;
+            return Task.CompletedTask;
         }
     }
 }

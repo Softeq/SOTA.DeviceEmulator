@@ -89,8 +89,8 @@
     </ApplicationDefinition>
     <Compile Include="Services\ApplicationContext.cs" />
     <Compile Include="Services\Configuration\ConfigurationChangedHandler.cs" />
-    <Compile Include="Services\Configuration\UpdateDeviceConfigurationCommand.cs" />
-    <Compile Include="Services\Configuration\UpdateDeviceConfigurationCommandHandler.cs" />
+    <Compile Include="Services\Configuration\DeviceConfigurationUpdated.cs" />
+    <Compile Include="Services\Configuration\ConfigurationUpdatedHandler.cs" />
     <Compile Include="Services\DevicePropertiesSerializer.cs" />
     <Compile Include="Services\DeviceProperties.cs" />
     <Compile Include="Services\Configuration\IDeviceConfigurationSerializer.cs" />
