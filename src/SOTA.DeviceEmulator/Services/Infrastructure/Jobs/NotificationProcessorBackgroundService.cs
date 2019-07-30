@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
@@ -38,7 +38,7 @@ namespace SOTA.DeviceEmulator.Services.Infrastructure.Jobs
             }
             else
             {
-                _logger.Debug("Successfully queued {NotificationType} for processing. Queue size: {QueueSize}.",
+                _logger.Verbose("Successfully queued {NotificationType} for processing. Queue size: {QueueSize}.",
                     notificationType, _processingBlock.InputCount);
             }
         }

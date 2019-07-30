@@ -11,7 +11,6 @@ using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
-using Serilog.Core;
 using Serilog.Events;
 using SOTA.DeviceEmulator.Services.Infrastructure.Logging;
 using SOTA.DeviceEmulator.Services.Provisioning;
@@ -52,7 +51,15 @@ namespace SOTA.DeviceEmulator
         protected override void OnStartup(object sender, StartupEventArgs e)
         {
             DisplayRootViewFor<ShellViewModel>();
-            _host.Start();
+            // Background services should run on background thread
+            Task.Run(() => _host.Start()).ContinueWith(OnHostStartupFailed, TaskContinuationOptions.OnlyOnFaulted);
+        }
+
+        private void OnHostStartupFailed(Task startupTask)
+        {
+            // Should be non null as continuation is only invoked on failure
+            // ReSharper disable once PossibleNullReferenceException
+            _logger.Fatal(startupTask.Exception.GetBaseException(), "Background host startup failed.");
         }
 
         protected override void OnExit(object sender, EventArgs e)

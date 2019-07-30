@@ -10,12 +10,14 @@ using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
 using Serilog;
 using SOTA.DeviceEmulator.Core;
-using SOTA.DeviceEmulator.Core.Sensors;
-using SOTA.DeviceEmulator.Core.Sensors.TimeFunctions;
+using SOTA.DeviceEmulator.Core.Configuration;
+using SOTA.DeviceEmulator.Core.Telemetry;
+using SOTA.DeviceEmulator.Core.Telemetry.TimeFunctions;
 using SOTA.DeviceEmulator.Services;
 using SOTA.DeviceEmulator.Services.Infrastructure.Jobs;
 using SOTA.DeviceEmulator.Services.Infrastructure.Logging;
-using SOTA.DeviceEmulator.Services.Settings;
+using SOTA.DeviceEmulator.Services.Infrastructure.Serialization;
+using SOTA.DeviceEmulator.Services.Provisioning;
 
 namespace SOTA.DeviceEmulator
 {
@@ -78,6 +80,10 @@ namespace SOTA.DeviceEmulator
                 .RegisterAssemblyTypes(ThisAssembly)
                 .AsClosedTypesOf(typeof(IRequestHandler<,>))
                 .SingleInstance();
+            builder
+                .RegisterType<EventPublisher>()
+                .As<IEventPublisher>()
+                .SingleInstance();
 
             builder.RegisterType<ApplicationSettings>()
                    .AsImplementedInterfaces()
@@ -91,11 +97,19 @@ namespace SOTA.DeviceEmulator
             };
             jsonSettings.Converters.Add(new StringEnumConverter { AllowIntegerValues = false });
             builder.RegisterInstance(jsonSettings);
-
             builder
-                .RegisterType<DeviceState>()
-                .As<IDeviceState>()
+                .RegisterType<TwinCollectionSerializer>()
+                .As<ITwinCollectionSerializer>()
                 .SingleInstance();
+            builder
+                .RegisterType<DevicePropertiesSerializer>()
+                .AsImplementedInterfaces()
+                .SingleInstance();
+            builder
+                .RegisterType<IoTHubMessageSerializer>()
+                .As<IIoTHubMessageSerializer>()
+                .SingleInstance();
+
             builder
                 .RegisterAssemblyTypes(typeof(ISensor).Assembly)
                 .AssignableTo<ISensor>()
@@ -106,10 +120,14 @@ namespace SOTA.DeviceEmulator
                 .As<IDevice>()
                 .SingleInstance();
             builder
+                .Register(ctx => ctx.Resolve<IDevice>().Configuration)
+                .As<IDeviceConfiguration>()
+                .InstancePerDependency();
+            builder
                 .RegisterAssemblyTypes(typeof(ITimeFunction<>).Assembly)
                 .AssignableTo<ITimeFunction<double>>()
                 .As<ITimeFunction<double>>()
-                .InstancePerDependency();
+                .SingleInstance();
             builder
                 .RegisterAssemblyTypes(typeof(ITimeFunction<>).Assembly)
                 .AssignableTo<ITimeFunction<IPoint>>()

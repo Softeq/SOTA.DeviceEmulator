@@ -13,6 +13,7 @@
              d:DataContext="{d:DesignInstance viewModels:SensorsViewModel}">
     <UserControl.Resources>
         <converters:LatLongToStringConverter x:Key="LatLongToStringConverter"/>
+        <converters:XceedDoubleValueFixConverter x:Key="XceedDoubleValueFixConverter"/>
     </UserControl.Resources>
     <StackPanel>
         <TextBlock
@@ -79,7 +80,7 @@
                         Grid.Row="0"
                         Grid.Column="2"
                         FormatString="N1"
-                        Value="{Binding SpeedMean}"
+                        Value="{Binding SpeedMean, Converter={StaticResource XceedDoubleValueFixConverter}}"
                         Increment="0.1"
                         Minimum="1"
                         Maximum="50"/>
@@ -87,7 +88,7 @@
                         Grid.Row="2"
                         Grid.Column="2"
                         FormatString="N1"
-                        Value="{Binding SpeedDeviation}"
+                        Value="{Binding SpeedDeviation, Converter={StaticResource XceedDoubleValueFixConverter}}"
                         Increment="0.1"
                         Minimum="0"
                         Maximum="{Binding SpeedMean}"/>
@@ -136,7 +137,7 @@
                         Grid.Row="2"
                         Grid.Column="2"
                         FormatString="N1"
-                        Value="{Binding PulseNoiseFactor}"
+                        Value="{Binding NoiseFactor}"
                         Increment="1"
                         Minimum="0"
                         Maximum="30"/>

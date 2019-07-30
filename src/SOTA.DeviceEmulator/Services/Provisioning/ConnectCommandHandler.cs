@@ -4,40 +4,48 @@ using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using System.Threading.Tasks;
+using Caliburn.Micro;
 using EnsureThat;
 using MediatR;
 using Microsoft.Azure.Devices.Client;
 using Microsoft.Azure.Devices.Provisioning.Client;
 using Microsoft.Azure.Devices.Provisioning.Client.Transport;
 using Microsoft.Azure.Devices.Shared;
-using Newtonsoft.Json;
 using Serilog;
 using SOTA.DeviceEmulator.Core;
+using SOTA.DeviceEmulator.Services.Configuration;
+using SOTA.DeviceEmulator.Services.Infrastructure.Logging;
 
 namespace SOTA.DeviceEmulator.Services.Provisioning
 {
-    public class ConnectCommandHandler : IRequestHandler<ConnectCommand, ConnectionModel>
+    internal class ConnectCommandHandler : IRequestHandler<ConnectCommand, ConnectionModel>
     {
+        private readonly IDevicePropertiesSerializer _devicePropertiesSerializer;
         private const string CertificatePassword = "sota";
         private readonly IApplicationContext _applicationContext;
         private readonly IDevice _device;
-        private readonly JsonSerializerSettings _jsonSerializerSettings;
         private readonly ILogger _logger;
         private readonly IMediator _mediator;
+        private readonly IEventPublisher _eventPublisher;
 
         public ConnectCommandHandler(
             IDevice device,
-            JsonSerializerSettings jsonSerializerSettings,
+            IDevicePropertiesSerializer devicePropertiesSerializer,
             ILogger logger,
             IMediator mediator,
-            IApplicationContext applicationContext
+            IApplicationContext applicationContext,
+            IEventPublisher eventPublisher
         )
         {
+            _devicePropertiesSerializer = Ensure.Any.IsNotNull(
+                devicePropertiesSerializer,
+                nameof(devicePropertiesSerializer)
+            );
             _mediator = Ensure.Any.IsNotNull(mediator, nameof(mediator));
             _applicationContext = Ensure.Any.IsNotNull(applicationContext, nameof(applicationContext));
-            _logger = Ensure.Any.IsNotNull(logger, nameof(logger));
+            _logger = Ensure.Any.IsNotNull(logger, nameof(logger)).ForContext(GetType());
             _device = Ensure.Any.IsNotNull(device, nameof(device));
-            _jsonSerializerSettings = Ensure.Any.IsNotNull(jsonSerializerSettings, nameof(jsonSerializerSettings));
+            _eventPublisher = Ensure.Any.IsNotNull(eventPublisher, nameof(eventPublisher));
         }
 
         public async Task<ConnectionModel> Handle(ConnectCommand request, CancellationToken cancellationToken)
@@ -65,25 +73,56 @@ namespace SOTA.DeviceEmulator.Services.Provisioning
                         security,
                         transport
                     );
-                    var metadataJson = JsonConvert.SerializeObject(_device.Metadata, _jsonSerializerSettings);
-                    var registration = new ProvisioningRegistrationAdditionalData {JsonData = metadataJson};
-                    var result = await provisioningClient.RegisterAsync(registration, cancellationToken);
+                    var registration = _devicePropertiesSerializer.SerializeToRegistrationData(_device.Information);
+                    var registrationResult = await provisioningClient.RegisterAsync(registration, cancellationToken);
                     _logger.Information(
                         "Device is registered. Device ID: {DeviceId}. Registration ID: {RegistrationId}.",
-                        result.DeviceId,
-                        result.RegistrationId
+                        registrationResult.DeviceId,
+                        registrationResult.RegistrationId
                     );
                     var deviceAuth = new DeviceAuthenticationWithX509Certificate(
-                        result.DeviceId,
+                        registrationResult.DeviceId,
                         security.GetAuthenticationCertificate()
                     );
-                    deviceClient = DeviceClient.Create(result.AssignedHub, deviceAuth, TransportType.Amqp);
+                    deviceClient = DeviceClient.Create(registrationResult.AssignedHub, deviceAuth, TransportType.Amqp);
                     await deviceClient.OpenAsync(cancellationToken);
+                    _logger.Information("Device client connection is open.");
                     await _mediator.Send(new DisconnectCommand(), cancellationToken);
                     _applicationContext.DeviceClient = deviceClient;
-                    var connectionMetadata = new DeviceConnectionMetadata(result.DeviceId, result.RegistrationId);
-                    _device.Connect(connectionMetadata);
+
+                    await deviceClient.SetDesiredPropertyUpdateCallbackAsync(OnDesiredPropertyChange, null, cancellationToken);
+
+                    var twin = await deviceClient.GetTwinAsync(cancellationToken);
+                    _logger.Debug("Initial device twin received: {@DeviceTwin}.", twin);
+                    var reportedProperties = _devicePropertiesSerializer.Deserialize(twin.Properties.Reported);
+                    var desiredProperties = _devicePropertiesSerializer.Deserialize(twin.Properties.Desired);
+                    
+                    var metadata = new DeviceMetadata(
+                        registrationResult.DeviceId,
+                        registrationResult.RegistrationId,
+                        reportedProperties.Configuration,
+                        desiredProperties.Configuration
+                    );
+                    var validationResult = _device.Connect(metadata);
                     _logger.Information("Device is connected.");
+                    _device.TryGetChangedConfiguration(out var actualConfiguration);
+                    var actualProperties = new DeviceProperties(_device.Information, actualConfiguration);
+                    if (!EqualityComparer<DeviceProperties>.Default.Equals(
+                        reportedProperties,
+                        actualProperties
+                    ))
+                    {
+                        var twinProperties =
+                            _devicePropertiesSerializer.Serialize(actualProperties);
+                        await deviceClient.UpdateReportedPropertiesAsync(twinProperties, cancellationToken);
+                        _logger.Information(
+                            "Device properties were reported: {@DeviceProperties}.",
+                            actualProperties
+                        );
+                    }
+
+                    _logger.LogValidationErrorsIfAny("Invalid device configuration provided", validationResult);
+
                     return new ConnectionModel(_device.DisplayName, _device.IsConnected);
                 }
             }
@@ -92,7 +131,9 @@ namespace SOTA.DeviceEmulator.Services.Provisioning
                 if (deviceClient != null)
                 {
                     disposables.Add(deviceClient);
+                    _applicationContext.DeviceClient = null;
                 }
+
                 throw;
             }
             finally
@@ -109,6 +150,18 @@ namespace SOTA.DeviceEmulator.Services.Provisioning
                     }
                 }
             }
+        }
+
+        private Task OnDesiredPropertyChange(TwinCollection twinCollection, object userContext)
+        {
+            var updateConfigurationEvent = new DeviceConfigurationRemotelyUpdated
+            {
+                TwinCollection = twinCollection
+            };
+
+            _eventPublisher.Publish(updateConfigurationEvent);
+
+            return Task.CompletedTask;
         }
     }
 }

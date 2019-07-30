@@ -1,33 +1,33 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Caliburn.Micro;
 using EnsureThat;
-using Serilog;
-using SOTA.DeviceEmulator.Core;
-using SOTA.DeviceEmulator.Core.Sensors;
-using SOTA.DeviceEmulator.Core.Sensors.TimeFunctions;
+using SOTA.DeviceEmulator.Core.Configuration;
+using SOTA.DeviceEmulator.Core.Telemetry;
+using SOTA.DeviceEmulator.Core.Telemetry.TimeFunctions;
+using SOTA.DeviceEmulator.Services;
 using SOTA.DeviceEmulator.Services.Telemetry;
 
 namespace SOTA.DeviceEmulator.ViewModels
 {
-    public sealed class SensorsViewModel : Screen, ITabViewModel, IHandle<TelemetryCollected>, ILocationSensorOptions, IPulseSensorOptions
+    public sealed class SensorsViewModel : Screen, ITabViewModel, IHandle<TelemetryCollected>, IHandle<Notification<DeviceConfigurationDownloaded>>
     {
+        private readonly IDeviceConfiguration _deviceState;
         private DeviceTelemetry _telemetry;
-        private double _speedMean = 5;
-        private double _speedDeviation = 1;
-        private ITimeFunction<double> _pulseFunction;
-        private int _pulseNoiseFactor = 3;
 
-        public SensorsViewModel(ILogger logger, IEventAggregator eventAggregator, IEnumerable<ITimeFunction<double>> doubleTimeFunctions)
+        public SensorsViewModel(
+            IDeviceConfiguration deviceState,
+            IEventAggregator eventAggregator,
+            IEnumerable<ITimeFunction<double>> doubleTimeFunctions
+        )
         {
+            _deviceState = Ensure.Any.IsNotNull(deviceState, nameof(deviceState));
             Ensure.Any.IsNotNull(eventAggregator, nameof(eventAggregator));
 
             TimeFunctions = doubleTimeFunctions.ToList();
-            PulseFunction = TimeFunctions.First();
-
             eventAggregator.Subscribe(this);
             DisplayName = "Sensors";
-            logger.Debug("Sensors view model created.");
         }
 
         public DeviceTelemetry Telemetry
@@ -38,26 +38,42 @@ namespace SOTA.DeviceEmulator.ViewModels
 
         public double SpeedMean
         {
-            get => _speedMean;
-            set => Set(ref _speedMean, value, nameof(SpeedMean));
+            get => _deviceState.Location.SpeedMean;
+            set
+            {
+                _deviceState.Location.SpeedMean = value;
+                NotifyOfPropertyChange(nameof(SpeedMean));
+            }
         }
 
         public double SpeedDeviation
         {
-            get => _speedDeviation;
-            set => Set(ref _speedDeviation, value, nameof(SpeedDeviation));
+            get => _deviceState.Location.SpeedDeviation;
+            set
+            {
+                _deviceState.Location.SpeedDeviation = value;
+                NotifyOfPropertyChange(nameof(SpeedDeviation));
+            }
         }
 
         public ITimeFunction<double> PulseFunction
         {
-            get => _pulseFunction;
-            set => Set(ref _pulseFunction, value, nameof(PulseFunction));
+            get => _deviceState.Pulse.Function;
+            set
+            {
+                _deviceState.Pulse.Function = value;
+                NotifyOfPropertyChange(nameof(PulseFunction));
+            }
         }
 
-        public int PulseNoiseFactor
+        public int NoiseFactor
         {
-            get => _pulseNoiseFactor;
-            set => Set(ref _pulseNoiseFactor, value, nameof(PulseNoiseFactor));
+            get => _deviceState.Pulse.NoiseFactor;
+            set
+            {
+                _deviceState.Pulse.NoiseFactor = value;
+                NotifyOfPropertyChange(nameof(NoiseFactor));
+            }
         }
 
         public string LocationText => "Location";
@@ -67,6 +83,11 @@ namespace SOTA.DeviceEmulator.ViewModels
         public void Handle(TelemetryCollected message)
         {
             Telemetry = message.Telemetry;
+        }
+
+        public void Handle(Notification<DeviceConfigurationDownloaded> message)
+        {
+            NotifyOfPropertyChange(null);
         }
     }
 }
