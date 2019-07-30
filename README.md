@@ -6,7 +6,7 @@ A desktop application that emulates a device in an IoT scenario. The repository 
 
 ## Installation
 
-- Make sure the [certificates from the Softeq portal](https://portal.softeq.com/display/SOTA/Environments+and+Credentials) are registered in the OS certificates store.
+- Make sure the [certificates from the Softeq portal](https://portal.softeq.com/display/SOTA/Environments+and+Credentials) are registered in the OS certificates user-personal store (`Cert:/CurrentUser/My` in PowerShell).
 - Download the needed build from:
   - [Azure DevOps Builds](https://dev.azure.com/SofteqDevelopment/SOTA/_build?definitionId=49) (all builds available). Downloads are performed using the [Azure CLI extension](https://github.com/Azure/azure-devops-cli-extension).
   - [GitHub Releases](https://github.com/Softeq/SOTA.DeviceEmulator/releases) (beta and stable releases).
