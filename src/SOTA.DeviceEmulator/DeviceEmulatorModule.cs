@@ -16,6 +16,7 @@ using SOTA.DeviceEmulator.Core.Telemetry.TimeFunctions;
 using SOTA.DeviceEmulator.Services;
 using SOTA.DeviceEmulator.Services.Infrastructure.Jobs;
 using SOTA.DeviceEmulator.Services.Infrastructure.Logging;
+using SOTA.DeviceEmulator.Services.Infrastructure.ModelMetadata;
 using SOTA.DeviceEmulator.Services.Infrastructure.Serialization;
 using SOTA.DeviceEmulator.Services.Provisioning;
 
@@ -90,6 +91,9 @@ namespace SOTA.DeviceEmulator
                    .SingleInstance();
             builder.RegisterType<ApplicationContext>()
                    .As<IApplicationContext>()
+                   .SingleInstance();
+            builder.RegisterType<ModelMetadataProvider>()
+                   .As<IModelMetadataProvider>()
                    .SingleInstance();
             var jsonSettings = new JsonSerializerSettings
             {
