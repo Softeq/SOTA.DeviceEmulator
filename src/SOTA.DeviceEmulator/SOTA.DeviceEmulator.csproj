@@ -96,6 +96,8 @@
     <Compile Include="Services\Configuration\IDeviceConfigurationSerializer.cs" />
     <Compile Include="Services\EventPublisher.cs" />
     <Compile Include="Services\IDevicePropertiesSerializer.cs" />
+    <Compile Include="Services\Infrastructure\ModelMetadata\IModelMetadataProvider.cs" />
+    <Compile Include="Services\Infrastructure\ModelMetadata\ModelMetadataProvider.cs" />
     <Compile Include="Services\Notification.cs" />
     <Compile Include="Services\Provisioning\IDeviceInformationSerializer.cs" />
     <Compile Include="Services\Infrastructure\Serialization\IoTHubMessageSerializer.cs" />
