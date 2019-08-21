@@ -55,16 +55,15 @@ namespace SOTA.DeviceEmulator.Services.Provisioning
             DeviceClient deviceClient = null;
             try
             {
-                var certificates = new X509Certificate2Collection();
-                certificates.Import(request.CertificatePath, CertificatePassword, X509KeyStorageFlags.UserKeySet);
-                var certificate = certificates.Cast<X509Certificate2>().FirstOrDefault(x => x.HasPrivateKey);
-                disposables.AddRange(certificates.Cast<X509Certificate2>().Where(c => !c.Equals(certificate)));
-                if (certificate == null)
+                var certificateChain = new X509Certificate2Collection();
+                certificateChain.Import(request.CertificatePath, CertificatePassword, X509KeyStorageFlags.UserKeySet);
+                var deviceCertificate = certificateChain.Cast<X509Certificate2>().FirstOrDefault(x => x.HasPrivateKey);
+                if (deviceCertificate == null)
                 {
-                    throw new InvalidOperationException("Failed to find a valid certificate.");
+                    throw new InvalidOperationException("Failed to find a valid device certificate.");
                 }
-
-                using (var security = new SecurityProviderX509Certificate(certificate))
+                certificateChain.Remove(deviceCertificate);
+                using (var security = new SecurityProviderX509Certificate(deviceCertificate, certificateChain))
                 using (var transport = new ProvisioningTransportHandlerAmqp(TransportFallbackType.TcpOnly))
                 {
                     var provisioningClient = ProvisioningDeviceClient.Create(
